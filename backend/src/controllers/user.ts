@@ -49,21 +49,69 @@ const logIn = async (req: Request, res: Response) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    const userAuth = await bcrypt.compare(password, user.password);
-    if (!userAuth) {
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
       return res
         .status(401)
         .json({ message: "Email or password doesn't match" });
     }
-    return res.status(200).json({ message: "User AUthorized" });
+    return res.status(200).json({ message: "User AUthorized", id: user.id });
   } catch (error) {}
 };
 
-const getUser = async (req: Request, res: Response) => {};
+const getUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const user = await prisma.user.findUnique({ where: { id: Number(id) } });
+    if (!user.email) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
-const Apply = (req: Request, res: Response) => {};
+const apply = async (req: Request, res: Response) => {
+  try {
+    const { userId, jobId, status } = req.body;
+    if (!userId || jobId || !status) {
+      return res.status(400).json({ message: "Incomplete Data" });
+    }
+    const application = await prisma.application.create({
+      data: {
+        jobId: Number(jobId),
+        applicantId: Number(userId),
+        status: status,
+      },
+    });
+    return res
+      .status(201)
+      .json({ message: "successfully applied", id: userId });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
-const viewApplications = (req: Request, res: Response) => {};
+const getApplications = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) {
+      return res.status(400).json({ message: "Incomplete Data" });
+    }
+    const applications = await prisma.application.findMany({
+      where: {
+        applicantId: Number(userId),
+      },
+    });
+    if (!applications) {
+      return res.status(404).json({ message: "Applications not found" });
+    }
+    return res.status(200).json({ applications });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 const viewApplication = async (req: Request, res: Response) => {
   try {
@@ -88,4 +136,23 @@ const viewApplication = async (req: Request, res: Response) => {
   }
 };
 
-const logOut = (req: Request, res: Response) => {};
+const logOut = (req: Request, res: Response) => {
+  const { userCookie } = req.cookies.userCookies;
+  if (!userCookie) {
+    return res
+      .status(401)
+      .json({ message: "Unauthorized access, Cookie not found" });
+  }
+  res.clearCookie(userCookie);
+  return res.status(200).json({ message: "successfully logged out" });
+};
+
+export {
+  signUp,
+  logIn,
+  logOut,
+  getUser,
+  viewApplication,
+  getApplications,
+  apply,
+};
