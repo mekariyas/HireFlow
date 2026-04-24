@@ -15,6 +15,7 @@ export const applicationStatusEnum = pgEnum("application_status", [
   "rejected",
 ]);
 
+export const roleEnum = pgEnum("role", ["user", "company"]);
 export const usersTable = pgTable("users", {
   id: integer().primaryKey().generatedAlwaysAsIdentity({ startWith: 100000 }),
   name: varchar({ length: 255 }).notNull(),
@@ -23,6 +24,7 @@ export const usersTable = pgTable("users", {
   password: varchar({ length: 255 }).notNull(),
   niche: varchar({ length: 255 }).notNull(),
   skills: text().notNull(),
+  role: roleEnum().notNull().default("user"),
   CVurl: varchar({ length: 255 }).notNull(),
   createdAt: timestamp().defaultNow().notNull(),
   updatedAt: timestamp().defaultNow().notNull(),
@@ -35,6 +37,7 @@ export const companyTable = pgTable("companies", {
   password: varchar({ length: 255 }).notNull(),
   niche: varchar({ length: 255 }).notNull(),
   description: text().notNull(),
+  role: roleEnum().notNull().default("user"),
   createdAt: timestamp().defaultNow().notNull(),
   updatedAt: timestamp().defaultNow().notNull(),
 });
