@@ -63,7 +63,7 @@ const logIn = async (req: Request, res: Response) => {
       .select({ email, password })
       .from(usersTable)
       .where(eq(usersTable.email, email));
-    const foundUser = user[0];
+    const foundUser: any = user[0];
     if (!foundUser.email) {
       return res.status(404).json({ message: "user not found" });
     }
@@ -74,7 +74,7 @@ const logIn = async (req: Request, res: Response) => {
 
     return res
       .status(200)
-      .json({ message: "Successfully logged in", foundUser });
+      .json({ message: "Successfully logged in", id: foundUser.id });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -180,14 +180,18 @@ const viewApplication = async (req: Request, res: Response) => {
 };
 
 const logOut = (req: Request, res: Response) => {
-  const { userCookie } = req.cookies.userCookies;
-  if (!userCookie) {
-    return res
-      .status(401)
-      .json({ message: "Unauthorized access, Cookie not found" });
+  try {
+    const { userCookie } = req.cookies.userCookies;
+    if (!userCookie) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized access, Cookie not found" });
+    }
+    res.clearCookie(userCookie);
+    return res.status(200).json({ message: "successfully logged out" });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
   }
-  res.clearCookie(userCookie);
-  return res.status(200).json({ message: "successfully logged out" });
 };
 
 export {
