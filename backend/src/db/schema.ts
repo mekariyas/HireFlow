@@ -37,7 +37,7 @@ export const companyTable = pgTable("companies", {
   password: varchar({ length: 255 }).notNull(),
   niche: varchar({ length: 255 }).notNull(),
   description: text().notNull(),
-  role: roleEnum().notNull().default("user"),
+  role: roleEnum().notNull().default("company"),
   createdAt: timestamp().defaultNow().notNull(),
   updatedAt: timestamp().defaultNow().notNull(),
 });
