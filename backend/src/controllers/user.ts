@@ -19,6 +19,7 @@ const signUp = async (req: Request, res: Response) => {
       skills,
       niche,
       CVurl,
+      profileImg,
     } = req.body;
     if (
       !email ||
@@ -45,6 +46,7 @@ const signUp = async (req: Request, res: Response) => {
       skills: skills.toString(),
       niche: niche.toString(),
       CVurl: CVurl,
+      profileURL: profileImg ? profileImg : "",
     });
 
     return res.status(201).json({ message: "Account Created" });
