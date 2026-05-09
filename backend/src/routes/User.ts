@@ -9,9 +9,22 @@ import {
   apply,
 } from "../controllers/user.js";
 
+import {
+  upload,
+  uploadMiddleWare,
+} from "../middleware/user/multer-cloudinary.js";
+
 const userRouter = express.Router();
 
-userRouter.post("/signUp", signUp);
+userRouter.post(
+  "/signUp",
+  upload.fields([
+    { name: "profileImg", maxCount: 1 },
+    { name: "cv", maxCount: 1 },
+  ]),
+  uploadMiddleWare,
+  signUp,
+);
 userRouter.post("/logIn", logIn);
 userRouter.get("/:id", getUser);
 userRouter.get("/:userId/job/:jobId/viewApplication/:id", viewApplication);

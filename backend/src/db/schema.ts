@@ -18,6 +18,7 @@ export const applicationStatusEnum = pgEnum("application_status", [
 export const roleEnum = pgEnum("role", ["user", "company"]);
 export const usersTable = pgTable("users", {
   id: integer().primaryKey().generatedAlwaysAsIdentity({ startWith: 100000 }),
+  profileURL: varchar({ length: 255 }),
   name: varchar({ length: 255 }).notNull(),
   age: integer().notNull(),
   email: varchar({ length: 255 }).notNull().unique(),
@@ -33,6 +34,7 @@ export const usersTable = pgTable("users", {
 export const companyTable = pgTable("companies", {
   id: integer().primaryKey().generatedAlwaysAsIdentity({ startWith: 100000 }),
   name: varchar({ length: 255 }).notNull(),
+  profileURL: varchar({ length: 255 }),
   email: varchar({ length: 255 }).notNull().unique(),
   password: varchar({ length: 255 }).notNull(),
   niche: varchar({ length: 255 }).notNull(),
