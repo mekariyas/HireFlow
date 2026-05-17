@@ -1,8 +1,23 @@
 import React from "react";
 import { RouterProvider, createBrowserRouter } from "react-router";
 
+
+//shared 
 import Home from "./shared/pages/Home";
+import About from "./shared/pages/About";
 import Index from "./shared/pages/Index";
+import Pricing from "./shared/pages/Pricing";
+
+
+//companies
+import Signup from "./company/pages/signup";
+import Login from "./company/pages/login";
+import Profile from "./company/pages/profile";
+
+
+//user
+import UserSignup from "./users/pages/signup";
+import UserLogin from "./users/pages/login";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -14,10 +29,45 @@ const App = () => {
           index: true,
           element: <Home />,
         },
+        { path: "/about",
+          element: <About/>,
+        },
+        {
+          path: "/pricing",
+          element: <Pricing/>
+        },
+        //Starting of company routes
+        {
+          path:"/companies",
+          children:[
+            { 
+              path: "/companies/signup",
+              element: <Signup/>
+            },
+            {
+              path: "/companies/login",
+              element: <Login/>
+            }
+          ]
+        },
+        //ending of company routes
+
+        //start of user routes
+        {
+          path: "/user",
+          children:[
+            { path:"/user/signUp",
+              element: <UserSignup/>
+            },
+            {
+              path: "/user/login",
+              element: <UserLogin/>
+            }
+          ]
+        }
+        //end of user routes
       ],
     },
-    {},
-    {},
   ]);
   return (
     <>
