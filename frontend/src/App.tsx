@@ -16,7 +16,8 @@ import Profile from "./company/pages/profile";
 
 
 //user
-
+import UserSignup from "./users/pages/signup";
+import UserLogin from "./users/pages/login";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -37,13 +38,33 @@ const App = () => {
         },
         //Starting of company routes
         {
-          path:"/company",
-          children:[]
-        }
+          path:"/companies",
+          children:[
+            { 
+              path: "/companies/signup",
+              element: <Signup/>
+            },
+            {
+              path: "/companies/login",
+              element: <Login/>
+            }
+          ]
+        },
         //ending of company routes
 
         //start of user routes
-
+        {
+          path: "/user",
+          children:[
+            { path:"/user/signUp",
+              element: <UserSignup/>
+            },
+            {
+              path: "/user/login",
+              element: <UserLogin/>
+            }
+          ]
+        }
         //end of user routes
       ],
     },
