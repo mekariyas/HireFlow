@@ -14,7 +14,7 @@ const signUp = async (req: Request, res: Response) => {
       password,
       first_name,
       last_name,
-      age,
+      date_of_birth,
       role,
       skills,
       niche,
@@ -30,7 +30,7 @@ const signUp = async (req: Request, res: Response) => {
       !skills ||
       !niche ||
       !CVurl ||
-      !age
+      !date_of_birth
     ) {
       return res.status(400).json({ message: "Incomplete Data" });
     }
@@ -38,10 +38,11 @@ const signUp = async (req: Request, res: Response) => {
     const salt = await bcrypt.genSalt(saltRounds);
     const hash = await bcrypt.hash(password, salt);
     await db.insert(usersTable).values({
-      name: first_name + " " + last_name,
+      first_name: first_name,
+      last_name: last_name,
       email: email.toString(),
       password: hash,
-      age: age,
+      date_of_birth: date_of_birth,
       role: role.toString(),
       skills: skills.toString(),
       niche: niche.toString(),
