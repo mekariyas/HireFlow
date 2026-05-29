@@ -125,7 +125,7 @@ const About = () => {
             Thousands of companies and candidates already trust HireFlow. Come see what the fuss is about.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
-            <a href="/signup" className="bg-white text-indigo-600 font-bold px-8 py-3 rounded-xl hover:bg-indigo-50 transition-colors">
+            <a href="/user/signup" className="bg-white text-indigo-600 font-bold px-8 py-3 rounded-xl hover:bg-indigo-50 transition-colors">
               Get Started Free
             </a>
             <a href="/pricing" className="border border-indigo-400 text-white font-bold px-8 py-3 rounded-xl hover:border-white transition-colors">

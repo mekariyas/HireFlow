@@ -14,7 +14,6 @@ const signUp = async (req: Request, res: Response) => {
       password,
       first_name,
       last_name,
-      age,
       role,
       skills,
       niche,
@@ -29,27 +28,40 @@ const signUp = async (req: Request, res: Response) => {
       !role ||
       !skills ||
       !niche ||
-      !CVurl ||
-      !age
+      !CVurl
     ) {
       return res.status(400).json({ message: "Incomplete Data" });
     }
+
+    const checkUser = await db
+      .select()
+      .from(usersTable)
+      .where(eq(email, email));
+    if (checkUser.length > 0) {
+      return res.status(409).json({ message: "User already exists" });
+    }
+
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
     const hash = await bcrypt.hash(password, salt);
-    await db.insert(usersTable).values({
-      name: first_name + " " + last_name,
-      email: email.toString(),
-      password: hash,
-      age: age,
-      role: role.toString(),
-      skills: skills.toString(),
-      niche: niche.toString(),
-      CVurl: CVurl,
-      profileURL: profileImg ? profileImg : "",
-    });
+    const newUser = await db
+      .insert(usersTable)
+      .values({
+        first_name: first_name,
+        last_name: last_name,
+        email: email.toString(),
+        password: hash,
+        role: role.toString(),
+        skills: skills.toString(),
+        niche: niche.toString(),
+        CVurl: CVurl,
+        profileURL: profileImg ? profileImg : "",
+      })
+      .returning();
 
-    return res.status(201).json({ message: "Account Created" });
+    return res
+      .status(201)
+      .json({ message: "Account Created", id: newUser[0]?.id });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });
   }

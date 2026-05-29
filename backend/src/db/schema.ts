@@ -5,7 +5,7 @@ import {
   text,
   timestamp,
   pgEnum,
-  uniqueIndex,
+  uniqueIndex
 } from "drizzle-orm/pg-core";
 
 export const jobStatusEnum = pgEnum("job_status", ["open", "closed"]);
@@ -19,8 +19,8 @@ export const roleEnum = pgEnum("role", ["user", "company"]);
 export const usersTable = pgTable("users", {
   id: integer().primaryKey().generatedAlwaysAsIdentity({ startWith: 100000 }),
   profileURL: varchar({ length: 255 }),
-  name: varchar({ length: 255 }).notNull(),
-  age: integer().notNull(),
+  first_name: varchar({ length: 255 }).notNull(),
+  last_name: varchar({ length: 255 }).notNull(),
   email: varchar({ length: 255 }).notNull().unique(),
   password: varchar({ length: 255 }).notNull(),
   niche: varchar({ length: 255 }).notNull(),
