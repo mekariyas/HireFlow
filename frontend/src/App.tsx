@@ -67,7 +67,7 @@ const App = () => {
               element: <UserLogin />,
             },
             {
-              path: "/user/profile",
+              path: "/user/:userId/profile",
               element: <Dashboard />,
             },
           ],

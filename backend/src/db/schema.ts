@@ -5,8 +5,7 @@ import {
   text,
   timestamp,
   pgEnum,
-  uniqueIndex,
-  date,
+  uniqueIndex
 } from "drizzle-orm/pg-core";
 
 export const jobStatusEnum = pgEnum("job_status", ["open", "closed"]);
@@ -28,7 +27,6 @@ export const usersTable = pgTable("users", {
   skills: text().notNull(),
   role: roleEnum().notNull().default("user"),
   CVurl: varchar({ length: 255 }).notNull(),
-  date_of_birth: date({ mode: "string" }),
   createdAt: timestamp().defaultNow().notNull(),
   updatedAt: timestamp().defaultNow().notNull(),
 });
