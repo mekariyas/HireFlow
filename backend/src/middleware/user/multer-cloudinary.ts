@@ -13,7 +13,7 @@ interface MulterFiles {
 
 export const upload = multer({
   storage: storage,
-  limits: { fileSize: 2 * 1024 * 1024 },
+  limits: { fileSize: 5 * 1024 * 1024 },
 });
 
 //Cloudinary configuration
@@ -39,16 +39,18 @@ export const uploadMiddleWare = async (
     } else if (cv.mimetype !== "application/pdf") {
       return res.status(400).json({ message: "cv must be in pdf format" });
     } else if (profileImg) {
-      await cloudinaryUpload(profileImg.buffer, {
-        asset_folder: `PERN/users/${personEmail}/profileImgs/${profileImg.originalname}`,
+      const profileId: any = await cloudinaryUpload(profileImg.buffer, {
+        asset_folder: `PERN/users/${personEmail}/profileImgs`,
+        resource_type: "image",
       });
-      req.body.profileImg = `PERN/users/${personEmail}/profileImgs/${profileImg.originalname}`;
+      req.body.profileImg = profileId.secure_url;
     }
 
-    await cloudinaryUpload(cv.buffer, {
-      asset_folder: `/PERN/users/${personEmail}/cvs/${cv.originalname}`,
+    const cvId: any = await cloudinaryUpload(cv.buffer, {
+      asset_folder: `/PERN/users/${personEmail}/cvs`,
+      resource_type: "auto",
     });
-    req.body.CVurl = `PERN/users/${personEmail}/cvs/${cv.originalname}`;
+    req.body.CVurl = cvId.secure_url;
     next();
   } catch (error) {
     return res.status(500).json({ message: error });
@@ -57,6 +59,7 @@ export const uploadMiddleWare = async (
 
 interface uploadOptions {
   asset_folder: string;
+  resource_type: "image" | "video" | "raw" | "auto";
 }
 
 const cloudinaryUpload = (buffer: Buffer, options: uploadOptions) => {
@@ -64,8 +67,8 @@ const cloudinaryUpload = (buffer: Buffer, options: uploadOptions) => {
     const stream = cloudinary.uploader.upload_stream(
       options,
       (error, result) => {
-        if (error) reject(error);
-        resolve(result);
+        if (error) return reject(error);
+        return resolve(result);
       },
     );
     stream.end(buffer);

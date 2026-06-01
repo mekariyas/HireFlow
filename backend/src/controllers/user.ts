@@ -63,20 +63,26 @@ const signUp = async (req: Request, res: Response) => {
       .status(201)
       .json({ message: "Account Created", id: newUser[0]?.id });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
 const logIn = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
+    const { userEmail, password } = req.body;
+    if (!userEmail || !password) {
       return res.status(400).json({ message: "Error, Incomplete data" });
     }
     const user = await db
-      .select({ email, password })
+      .select({
+        id: usersTable.id,
+        email: usersTable.email,
+        password: usersTable.password,
+      })
       .from(usersTable)
-      .where(eq(usersTable.email, email));
+      .where(eq(usersTable.email, userEmail))
+      .limit(1);
     const foundUser: any = user[0];
     if (!foundUser.email) {
       return res.status(404).json({ message: "user not found" });
@@ -102,15 +108,29 @@ const getUser = async (req: Request, res: Response) => {
     }
 
     const user = await db
-      .select()
+      .select({
+        id: usersTable.id,
+        email: usersTable.email,
+        firstName: usersTable.first_name,
+        lastName: usersTable.last_name,
+        role: usersTable.role,
+        skills: usersTable.skills,
+        niche: usersTable.niche,
+        CVurl: usersTable.CVurl,
+        profileURL: usersTable.profileURL,
+      })
       .from(usersTable)
-      .where(eq(usersTable.id, Number(id)));
+      .where(eq(usersTable.id, Number(id)))
+      .limit(1);
     const foundUser = user[0];
     if (!foundUser) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    return res.status(200).json({ message: "user found", foundUser });
+    return res.status(200).json({
+      message: "user found",
+      ...foundUser,
+    });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });
   }

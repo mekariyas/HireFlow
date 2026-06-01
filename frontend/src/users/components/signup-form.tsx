@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { Button } from "../../components/ui/button";
@@ -9,6 +10,7 @@ import {
   NativeSelectOption,
 } from "../../components/ui/native-select";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 // type import
 import type { ISignUp } from "../types/user-types";
@@ -32,7 +34,6 @@ const SignUpForm = () => {
   };
 
   const handleSignUp: SubmitHandler<ISignUp> = async (data) => {
-    // eslint-disable-next-line no-useless-catch
     try {
       setIsLoading(true);
       const formData = new FormData();
@@ -42,6 +43,7 @@ const SignUpForm = () => {
       formData.set("password", data.password);
       formData.set("skills", data.skills);
       formData.set("cv", data.cv[0]);
+      formData.set("role", "user");
       formData.set("niche", data.niche);
       formData.set("profileImg", data.profileImg ? data.profileImg[0] : "");
 
@@ -51,7 +53,12 @@ const SignUpForm = () => {
       const { id } = signUp.data;
       navigate(`/user/${id}/profile`);
     } catch (error) {
-      throw error;
+      if (error instanceof Error) {
+        toast(error.message);
+      }
+      if (error instanceof AxiosError) {
+        toast(error.message);
+      }
       setIsLoading(false);
     }
   };

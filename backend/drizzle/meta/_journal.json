@@ -8,6 +8,13 @@
       "when": 1780049070999,
       "tag": "0000_mixed_bushwacker",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1780255073207,
+      "tag": "0001_quick_lady_bullseye",
+      "breakpoints": true
     }
   ]
 }

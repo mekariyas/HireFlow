@@ -5,7 +5,7 @@ import {
   text,
   timestamp,
   pgEnum,
-  uniqueIndex
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 export const jobStatusEnum = pgEnum("job_status", ["open", "closed"]);
@@ -16,33 +16,41 @@ export const applicationStatusEnum = pgEnum("application_status", [
 ]);
 
 export const roleEnum = pgEnum("role", ["user", "company"]);
-export const usersTable = pgTable("users", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity({ startWith: 100000 }),
-  profileURL: varchar({ length: 255 }),
-  first_name: varchar({ length: 255 }).notNull(),
-  last_name: varchar({ length: 255 }).notNull(),
-  email: varchar({ length: 255 }).notNull().unique(),
-  password: varchar({ length: 255 }).notNull(),
-  niche: varchar({ length: 255 }).notNull(),
-  skills: text().notNull(),
-  role: roleEnum().notNull().default("user"),
-  CVurl: varchar({ length: 255 }).notNull(),
-  createdAt: timestamp().defaultNow().notNull(),
-  updatedAt: timestamp().defaultNow().notNull(),
-});
+export const usersTable = pgTable(
+  "users",
+  {
+    id: integer().primaryKey().generatedAlwaysAsIdentity({ startWith: 100000 }),
+    profileURL: varchar({ length: 255 }),
+    first_name: varchar({ length: 255 }).notNull(),
+    last_name: varchar({ length: 255 }).notNull(),
+    email: varchar({ length: 255 }).notNull().unique(),
+    password: varchar({ length: 255 }).notNull(),
+    niche: varchar({ length: 255 }).notNull(),
+    skills: text().notNull(),
+    role: roleEnum().notNull().default("user"),
+    CVurl: varchar({ length: 255 }).notNull(),
+    createdAt: timestamp().defaultNow().notNull(),
+    updatedAt: timestamp().defaultNow().notNull(),
+  },
+  (table) => [uniqueIndex("UserEmail_idx").on(table.email)],
+);
 
-export const companyTable = pgTable("companies", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity({ startWith: 100000 }),
-  name: varchar({ length: 255 }).notNull(),
-  profileURL: varchar({ length: 255 }),
-  email: varchar({ length: 255 }).notNull().unique(),
-  password: varchar({ length: 255 }).notNull(),
-  niche: varchar({ length: 255 }).notNull(),
-  description: text().notNull(),
-  role: roleEnum().notNull().default("company"),
-  createdAt: timestamp().defaultNow().notNull(),
-  updatedAt: timestamp().defaultNow().notNull(),
-});
+export const companyTable = pgTable(
+  "companies",
+  {
+    id: integer().primaryKey().generatedAlwaysAsIdentity({ startWith: 100000 }),
+    name: varchar({ length: 255 }).notNull(),
+    profileURL: varchar({ length: 255 }),
+    email: varchar({ length: 255 }).notNull().unique(),
+    password: varchar({ length: 255 }).notNull(),
+    niche: varchar({ length: 255 }).notNull(),
+    description: text().notNull(),
+    role: roleEnum().notNull().default("company"),
+    createdAt: timestamp().defaultNow().notNull(),
+    updatedAt: timestamp().defaultNow().notNull(),
+  },
+  (table) => [uniqueIndex("CompanyEmail_idx").on(table.email)],
+);
 
 export const jobsTable = pgTable("jobs", {
   id: integer().primaryKey().generatedAlwaysAsIdentity({ startWith: 100000 }),
