@@ -1,4 +1,5 @@
 import { RouterProvider, createBrowserRouter } from "react-router";
+import { Toaster } from "sonner";
 
 //shared
 import Home from "./shared/pages/Home";
@@ -6,16 +7,16 @@ import About from "./shared/pages/About";
 import Index from "./shared/pages/Index";
 import Pricing from "./shared/pages/Pricing";
 import Dashboard from "./shared/pages/dashboard";
-import Profile from "./shared/pages/Profile";
 import Settings from "./shared/pages/Settings";
 
 //companies
 import Signup from "./company/pages/signup";
 import Login from "./company/pages/login";
-
+import Profile from "./company/pages/profile";
 //user
 import UserSignup from "./users/pages/signup";
 import UserLogin from "./users/pages/login";
+import UserProfile from "./users/pages/UserProfile";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -69,6 +70,7 @@ const App = () => {
             {
               path: "/user/:userId/profile",
               element: <Dashboard />,
+              children: [{ index: true, element: <UserProfile /> }],
             },
           ],
         },
@@ -78,6 +80,7 @@ const App = () => {
   ]);
   return (
     <>
+      <Toaster />
       <RouterProvider router={router} />
     </>
   );
