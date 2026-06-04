@@ -6,11 +6,8 @@ import {
   AvatarImage,
   AvatarFallback,
 } from "../../components/ui/avatar";
-//import { saveAs } from "file-saver";
-
 import Error from "../../shared/components/Error";
 import Spinner from "../../shared/components/Loading";
-import ViewCV from "../../shared/components/ViewCV";
 import api from "../../api/axios";
 
 const UserProfile = () => {
@@ -38,10 +35,11 @@ const UserProfile = () => {
   }
 
   if (data) {
-    //const downloadName = data.data.CVurl.split("/").at(-1);
+    const getDownloadUrl = (url: string) =>
+      url.replace("/upload/", "/upload/fl_attachment/");
     return (
-      <section className="w-full flex flex-col gap-2">
-        <section className="w-full flex justify-center gap-3 items-center pt-10  border-2 border-red-600">
+      <section className="w-full h-[60vh] flex flex-col gap-2">
+        <section className="w-full flex justify-around lg:justify-center lg:gap-3 items-center pt-10">
           <Avatar className="border-[0.2px] w-40 h-40">
             <AvatarImage
               src={data.data.profileURL}
@@ -53,20 +51,32 @@ const UserProfile = () => {
             </AvatarFallback>
           </Avatar>
           <section className="w-[30%] flex flex-col items-center">
-            <p className="font-bold text-lg w-[80%]">
+            <p className="font-bold text-lg w-full lg:w-[80%] text-start">
               {data.data.firstName} {data.data.lastName}
             </p>
             <section className="flex flex-col items-center gap-2">
-              <p className="w-full text-lg text-slate-700">
+              <p className="w-full md:text-lg text-slate-700 text-start">
                 {data.data.skills}
               </p>
-              <button className="w-40 h-10 bg-blue-950 rounded-lg text-white font-bold">
-                Download Resume
-              </button>
+              <section className="w-full flex flex-col lg:flex-row gap-2">
+                <a
+                  href={getDownloadUrl(data.data.CVurl)}
+                  className="w-40 h-10 bg-blue-950 flex items-center justify-center rounded-lg cursor-pointer text-white font-bold"
+                >
+                  Download Resume
+                </a>
+                <a
+                  href={getDownloadUrl(data.data.CVurl)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-40 h-10  bg-gray-700 flex items-center justify-center rounded-lg cursor-pointer text-white font-bold"
+                >
+                  View Resume
+                </a>
+              </section>
             </section>
           </section>
         </section>
-        <ViewCV />
       </section>
     );
   }

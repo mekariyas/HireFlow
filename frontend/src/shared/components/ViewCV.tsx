@@ -1,9 +1,7 @@
-import React from "react";
-
-const ViewCV = () => {
+const ViewCV = ({ url }: { url: string }) => {
   return (
-    <section className="w-full h-screen">
-      <h2>Resume</h2>
+    <section className="w-full h-screen flex items-center justify-center overflow-hidden">
+      {url}
     </section>
   );
 };
