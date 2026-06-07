@@ -12,7 +12,7 @@ import Settings from "./shared/pages/Settings";
 //companies
 import Signup from "./company/pages/signup";
 import Login from "./company/pages/login";
-import Profile from "./company/pages/profile";
+import CompanyProfile from "./company/pages/CompanyProfile";
 //user
 import UserSignup from "./users/pages/signup";
 import UserLogin from "./users/pages/login";
@@ -46,9 +46,9 @@ const App = () => {
               element: <Login />,
             },
             {
-              path: "/companies/company/profile",
+              path: "/companies/:companyId/profile",
               element: <Dashboard />,
-              children: [{ index: true, element: <Profile /> }],
+              children: [{ index: true, element: <CompanyProfile /> }],
             },
             {
               path: "/companies/company/Settings",

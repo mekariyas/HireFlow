@@ -7,7 +7,7 @@ import { CardAction } from "../../components/ui/card";
 import { Eye, EyeClosed } from "lucide-react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { type ISignIn } from "../types/user-types";
+import { type ISignIn } from "../types/company-types";
 
 import { useForm, type SubmitHandler } from "react-hook-form";
 import api from "../../api/axios";
@@ -31,12 +31,12 @@ const LoginForm = () => {
     try {
       setIsLoading(true);
       const logIn = await api.post(
-        "/user/logIn",
+        "/company/logIn",
         { userEmail: data.email, password: data.password },
         { withCredentials: true },
       );
       const { id } = logIn.data;
-      navigate(`/user/${id}/profile`);
+      navigate(`/company/${id}/profile`);
     } catch (error) {
       if (error instanceof AxiosError) {
         toast(error.response?.data.message);

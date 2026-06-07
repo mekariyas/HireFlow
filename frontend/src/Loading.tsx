@@ -6,7 +6,6 @@ const Loading = () => {
         src={HireFlow}
         alt="Hireflow icon"
         className="w-20 h-20 object-fit-contain"
-        loading="lazy"
       />
       <section className="flex space-x-2 justify-center items-center bg-white dark:invert">
         <div className="h-4 w-4 bg-black rounded-full animate-bounce [animation-delay:-0.3s]"></div>

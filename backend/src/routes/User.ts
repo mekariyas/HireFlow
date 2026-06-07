@@ -9,6 +9,7 @@ import {
   apply,
 } from "../controllers/user.js";
 
+import { checkUserEmail } from "../middleware/user/checkUserEmail.js";
 import {
   upload,
   uploadMiddleWare,
@@ -18,11 +19,14 @@ const userRouter = express.Router();
 
 userRouter.post(
   "/signUp",
-  upload.fields([
-    { name: "profileImg", maxCount: 1 },
-    { name: "cv", maxCount: 1 },
-  ]),
-  uploadMiddleWare,
+  [
+    upload.fields([
+      { name: "profileImg", maxCount: 1 },
+      { name: "cv", maxCount: 1 },
+    ]),
+    uploadMiddleWare,
+    checkUserEmail,
+  ],
   signUp,
 );
 userRouter.post("/logIn", logIn);
