@@ -2,15 +2,30 @@ import express from "express";
 import {
   signUp,
   logIn,
+  getProfile,
   postJob,
   getApplications,
   getApplication,
   logOut,
 } from "../controllers/company.js";
+import {
+  upload,
+  uploadMiddleWare,
+} from "../middleware/company/multer-cloudinary.js";
+import { checkCompanyEmail } from "../middleware/company/checkCompanyEmail.js";
 
 const companyRouter = express.Router();
 
-companyRouter.post("/signUp", signUp);
+companyRouter.post(
+  "/signUp",
+  [
+    upload.fields([{ name: "profileImg", maxCount: 1 }]),
+    uploadMiddleWare,
+    checkCompanyEmail,
+  ],
+  signUp,
+);
+companyRouter.get("/:id", getProfile);
 companyRouter.post("/login", logIn);
 companyRouter.post("/postJob", postJob);
 companyRouter.get("/jobs/:jobId/applications", getApplications);

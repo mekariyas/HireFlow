@@ -66,7 +66,7 @@ const UserProfile = () => {
                   Download Resume
                 </a>
                 <a
-                  href={getDownloadUrl(data.data.CVurl)}
+                  href={data.data.CVurl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-40 h-10  bg-gray-700 flex items-center justify-center rounded-lg cursor-pointer text-white font-bold"

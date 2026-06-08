@@ -11,35 +11,38 @@ import {
 } from "../db/schema.js";
 
 const db = drizzle(process.env.DATABASE_URL!);
+
 export const signUp = async (req: Request, res: Response) => {
   try {
-    const {
-      name,
-      email,
-      password,
-      niche,
-      description,
-    }: {
-      name: string;
-      email: string;
-      niche: string;
-      password: string;
-      description: string;
-    } = req.body;
-    if (!name || !email! || password || !niche || !description) {
+    // console.log("Controller start");
+    // console.log(req.body);
+    // return;
+    const { name, email, password, niche, role, description, profileImg } =
+      req.body;
+
+    if (!name || !email! || !password || !role || !niche || !description) {
       return res.status(400).json({ message: "Incomplete Data" });
     }
+
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
     const hash = await bcrypt.hash(password, salt);
 
-    await db.insert(companyTable).values({
-      name: name,
-      email: email,
-      password: hash,
-      niche,
-      description,
-    });
+    const newCompany = await db
+      .insert(companyTable)
+      .values({
+        name,
+        email,
+        password: hash,
+        niche,
+        role,
+        description,
+        profileURL: profileImg,
+      })
+      .returning();
+    return res
+      .status(201)
+      .json({ message: "Profile created", id: newCompany[0]?.id });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -51,38 +54,103 @@ export const logIn = async (req: Request, res: Response) => {
     if (!email || !password) {
       return res.status(400).json({ message: "Error, Incomplete data" });
     }
-    const user = await db
-      .select({ email, password })
+    const company = await db
+      .select({
+        id: companyTable.id,
+        email: companyTable.email,
+        password: companyTable.password,
+      })
       .from(companyTable)
       .where(eq(companyTable.email, email));
 
-    const foundUser: any = user[0];
-    if (!foundUser.email) {
+    const foundCompany:
+      | { email: string; password: string; id: number }
+      | undefined = company[0];
+    if (!foundCompany?.email) {
       return res.status(404).json({ message: "user not found" });
     }
-    const userAuth = await bcrypt.compare(password, foundUser.password);
+    const userAuth = await bcrypt.compare(password, foundCompany.password);
     if (!userAuth) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
     return res
       .status(200)
-      .json({ message: "Successfully logged in", id: foundUser.id });
+      .json({ message: "Successfully logged in", id: foundCompany.id });
   } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const getProfile = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: "Error, Incomplete data" });
+    }
+
+    const company = await db
+      .select({
+        id: companyTable.id,
+        email: companyTable.email,
+        name: companyTable.name,
+        role: companyTable.role,
+        niche: companyTable.niche,
+        profileURL: companyTable.profileURL,
+        description: companyTable.description,
+      })
+      .from(companyTable)
+      .where(eq(companyTable.id, Number(id)))
+      .limit(1);
+    const foundCompany = company[0];
+    if (!foundCompany) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      message: "user found",
+      ...foundCompany,
+    });
+  } catch (error: any) {
+    console.error(error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
 export const postJob = async (req: Request, res: Response) => {
   try {
-    const { title, description, companyId } = req.body;
-    if (!title || !description || !companyId) {
+    const { title, description, location, jobType, companyId } = req.body;
+    if (!title || !description || !companyId || !location || !jobType) {
       return res.status(400).json({ message: "Error, Incomplete data" });
     }
+
+    const id = Number(companyId);
+    if (!id) {
+      return res
+        .status(400)
+        .json({ message: "Invalid user, unable to post job" });
+    }
+    const company = await db
+      .select({
+        id: companyTable.id,
+        niche: companyTable.niche,
+      })
+      .from(companyTable)
+      .where(eq(companyTable.id, id))
+      .limit(1);
+    const foundCompany = company[0];
+    if (!foundCompany) {
+      return res
+        .status(404)
+        .json({ message: "User not found, unable to post job" });
+    }
+
     await db.insert(jobsTable).values({
       title: title,
-      description: title,
-      companyId: Number(companyId),
+      description: description,
+      locationType: location,
+      jobType,
+      companyId: foundCompany.id,
     });
 
     return res.status(201).json({ message: "Job Posted" });

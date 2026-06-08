@@ -13,7 +13,10 @@ import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
 // type import
-import type { ISignUp } from "../types/user-types";
+import type { ISignUp } from "../types/company-types";
+
+import { Field, FieldDescription, FieldLabel } from "../../components/ui/field";
+import { Textarea } from "../../components/ui/textarea";
 
 //axios instance
 import api from "../../api/axios";
@@ -37,29 +40,29 @@ const SignUpForm = () => {
     try {
       setIsLoading(true);
       const formData = new FormData();
-      formData.set("first_name", data.firstName);
-      formData.set("last_name", data.lastName);
+      formData.set("name", data.name);
       formData.set("email", data.email);
       formData.set("password", data.password);
-      formData.set("skills", data.skills);
-      formData.set("cv", data.cv[0]);
-      formData.set("role", "user");
+      formData.set("role", "company");
       formData.set("niche", data.niche);
+      formData.set("description", data.description);
       formData.set("profileImg", data.profileImg ? data.profileImg[0] : "");
-
-      const signUp = await api.post("/user/signUp", formData, {
+      console.log('creating profile')
+      const signUp = await api.post("/company/signUp", formData, {
         withCredentials: true,
       });
+      console.log(signUp);
       const { id } = signUp.data;
-      navigate(`/user/${id}/profile`);
+      navigate(`/companies/${id}/profile`);
     } catch (error) {
       if (error instanceof AxiosError) {
         toast(error.response?.data.message);
-        return setIsLoading(false);
+        return setIsLoading(false)
+        
       }
       if (error instanceof Error) {
         toast(error.message);
-        return setIsLoading(false);
+        return setIsLoading(false)
       }
     }
   };
@@ -67,26 +70,14 @@ const SignUpForm = () => {
     <form onSubmit={handleSubmit(handleSignUp)}>
       <div className="flex flex-col gap-6">
         <div className="grid gap-2">
-          <Label htmlFor="first name">First Name</Label>
+          <Label htmlFor="first name">Company Name</Label>
           <Input
             type="text"
-            placeholder="John"
-            {...register("firstName", { required: true, minLength: 3 })}
+            placeholder="Deloitte"
+            {...register("name", { required: true, minLength: 3 })}
             className="required:border-red-500"
           />
-          {errors.firstName && (
-            <span className="text-red-600">This field is required</span>
-          )}
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="Last name">Last Name</Label>
-          <Input
-            type="text"
-            placeholder="Doe"
-            {...register("lastName", { required: true, minLength: 3 })}
-            className="required:border-red-500"
-          />
-          {errors.lastName && (
+          {errors.name && (
             <span className="text-red-600">This field is required</span>
           )}
         </div>
@@ -119,29 +110,6 @@ const SignUpForm = () => {
             </Button>
           </div>
           {errors.password && (
-            <span className="text-red-600">This field is required</span>
-          )}
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="skills">Skills</Label>
-          <Input
-            type="text"
-            placeholder="Eg:- front end development, sales marketer etc"
-            {...register("skills", { required: true, minLength: 3 })}
-            className="required:border-red-500"
-          />
-          {errors.skills && (
-            <span className="text-red-600">This field is required</span>
-          )}
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="cv">CV (Pdf)</Label>
-          <Input
-            type="file"
-            {...register("cv", { required: true })}
-            className="required:border-red-500"
-          />
-          {errors.cv && (
             <span className="text-red-600">This field is required</span>
           )}
         </div>
@@ -185,9 +153,25 @@ const SignUpForm = () => {
             <span className="text-red-600">This field is required</span>
           )}
         </div>
+        <div className="grid gap-2">
+          <Field className="grid gap-2">
+            <FieldLabel htmlFor="textarea-message">Description</FieldLabel>
+            <FieldDescription>Briefly describe the Company.</FieldDescription>
+            <Textarea
+              maxLength={2000}
+              id="textarea-message"
+              placeholder="Describe your company."
+              className="h-64"
+              {...register("description", { required: true })}
+            />
+            {errors.description && (
+              <span className="text-red-600">This field is required</span>
+            )}
+          </Field>
+        </div>
         <Button
           type="submit"
-          className="w-[100%] h-12 text-lg font-bold bg-slate-950 text-white rounded-md cursor-pointer"
+          className="w-full h-12 text-lg font-bold bg-slate-950 text-white rounded-md cursor-pointer"
           disabled={isLoading}
         >
           Sign Up
