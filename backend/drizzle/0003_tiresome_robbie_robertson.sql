@@ -1,0 +1,2 @@
+ALTER TABLE "jobs" ADD COLUMN "companyNiche" varchar(255);--> statement-breakpoint
+ALTER TABLE "jobs" ADD CONSTRAINT "jobs_companyNiche_companies_niche_fk" FOREIGN KEY ("companyNiche") REFERENCES "public"."companies"("niche") ON DELETE cascade ON UPDATE no action;

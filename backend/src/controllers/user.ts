@@ -83,8 +83,10 @@ const logIn = async (req: Request, res: Response) => {
       .from(usersTable)
       .where(eq(usersTable.email, userEmail))
       .limit(1);
-    const foundUser: any = user[0];
-    if (!foundUser.email) {
+    const foundUser:
+      | { email: string; password: string; id: number }
+      | undefined = user[0];
+    if (!foundUser?.email) {
       return res.status(404).json({ message: "user not found" });
     }
     const userAuth = await bcrypt.compare(password, foundUser.password);

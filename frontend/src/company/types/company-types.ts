@@ -12,3 +12,10 @@ export interface ISignUp {
   description: string;
   profileImg?: FileList;
 }
+
+export interface IJobForm {
+  location: string;
+  jobType: string;
+  title: string;
+  description: string;
+}

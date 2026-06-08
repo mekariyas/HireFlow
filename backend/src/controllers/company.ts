@@ -54,23 +54,29 @@ export const logIn = async (req: Request, res: Response) => {
     if (!email || !password) {
       return res.status(400).json({ message: "Error, Incomplete data" });
     }
-    const user = await db
-      .select({ email, password })
+    const company = await db
+      .select({
+        id: companyTable.id,
+        email: companyTable.email,
+        password: companyTable.password,
+      })
       .from(companyTable)
       .where(eq(companyTable.email, email));
 
-    const foundUser: any = user[0];
-    if (!foundUser.email) {
+    const foundCompany:
+      | { email: string; password: string; id: number }
+      | undefined = company[0];
+    if (!foundCompany?.email) {
       return res.status(404).json({ message: "user not found" });
     }
-    const userAuth = await bcrypt.compare(password, foundUser.password);
+    const userAuth = await bcrypt.compare(password, foundCompany.password);
     if (!userAuth) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
     return res
       .status(200)
-      .json({ message: "Successfully logged in", id: foundUser.id });
+      .json({ message: "Successfully logged in", id: foundCompany.id });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -113,14 +119,38 @@ export const getProfile = async (req: Request, res: Response) => {
 
 export const postJob = async (req: Request, res: Response) => {
   try {
-    const { title, description, companyId } = req.body;
-    if (!title || !description || !companyId) {
+    const { title, description, location, jobType, companyId } = req.body;
+    if (!title || !description || !companyId || !location || !jobType) {
       return res.status(400).json({ message: "Error, Incomplete data" });
     }
+
+    const id = Number(companyId);
+    if (!id) {
+      return res
+        .status(400)
+        .json({ message: "Invalid user, unable to post job" });
+    }
+    const company = await db
+      .select({
+        id: companyTable.id,
+        niche: companyTable.niche,
+      })
+      .from(companyTable)
+      .where(eq(companyTable.id, id))
+      .limit(1);
+    const foundCompany = company[0];
+    if (!foundCompany) {
+      return res
+        .status(404)
+        .json({ message: "User not found, unable to post job" });
+    }
+
     await db.insert(jobsTable).values({
       title: title,
-      description: title,
-      companyId: Number(companyId),
+      description: description,
+      locationType: location,
+      jobType,
+      companyId: foundCompany.id,
     });
 
     return res.status(201).json({ message: "Job Posted" });

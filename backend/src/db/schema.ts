@@ -8,6 +8,17 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
+export const locationTypeEnum = pgEnum("location_type", [
+  "Remote",
+  "Hybrid",
+  "On-site",
+]);
+export const jobTypeEnum = pgEnum("job_type", [
+  "Full-time",
+  "Part-time",
+  "Contract",
+  "Internship",
+]);
 export const jobStatusEnum = pgEnum("job_status", ["open", "closed"]);
 export const applicationStatusEnum = pgEnum("application_status", [
   "pending",
@@ -57,6 +68,8 @@ export const jobsTable = pgTable("jobs", {
   title: varchar({ length: 255 }).notNull(),
   description: text().notNull(),
   status: jobStatusEnum().notNull().default("open"),
+  locationType: locationTypeEnum("location_type").notNull(),
+  jobType: jobTypeEnum("job_type").notNull(),
   createdAt: timestamp().notNull().defaultNow(),
   updatedAt: timestamp().defaultNow().notNull(),
   companyId: integer("company_id").references(() => companyTable.id, {

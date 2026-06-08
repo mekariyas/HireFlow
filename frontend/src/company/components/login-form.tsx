@@ -32,11 +32,11 @@ const LoginForm = () => {
       setIsLoading(true);
       const logIn = await api.post(
         "/company/logIn",
-        { userEmail: data.email, password: data.password },
+        { email: data.email, password: data.password },
         { withCredentials: true },
       );
       const { id } = logIn.data;
-      navigate(`/company/${id}/profile`);
+      navigate(`/companies/${id}/profile`);
     } catch (error) {
       if (error instanceof AxiosError) {
         toast(error.response?.data.message);
