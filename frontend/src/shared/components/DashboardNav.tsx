@@ -15,7 +15,11 @@ const DashboardNav = () => {
   return (
     <section className="w-full h-20  text-white bg-gray-900 shadow-2xl flex  justify-evenly items-center sticky top-16 z-50">
       <NavLink
-        to="/"
+        to={
+          companyId
+            ? `/companies/${companyId}/dashboard`
+            : `/user/${userId}/dashboard`
+        }
         className="flex items-center gap-2 hover:text-indigo-300 transition-colors"
       >
         <User />
@@ -31,18 +35,18 @@ const DashboardNav = () => {
       {companyId && (
         <>
           <NavLink
-            to="/"
+            to={`/companies/${companyId}/dashboard/listings`}
             className="flex items-center gap-2 hover:text-indigo-300 transition-colors"
           >
             <FileText />
-            <span className="hidden lg:inline-block">Posts</span>
+            <span className="hidden lg:inline-block">My Listings</span>
           </NavLink>
         </>
       )}
       {userId && (
         <>
           <NavLink
-            to="/"
+            to={`/user/${userId}/dashboard/jobs`}
             className="flex items-center gap-2 hover:text-indigo-300 transition-colors"
           >
             <BriefcaseBusiness />
@@ -51,7 +55,11 @@ const DashboardNav = () => {
         </>
       )}
       <NavLink
-        to="/"
+        to={
+          companyId
+            ? `/companies/${companyId}/dashboard/settings`
+            : `/user/${userId}/dashboard/settings`
+        }
         className="flex items-center gap-2 hover:text-indigo-300 transition-colors"
       >
         <Settings />

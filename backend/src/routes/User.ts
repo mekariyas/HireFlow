@@ -9,6 +9,8 @@ import {
   apply,
 } from "../controllers/user.js";
 
+import { getJobs } from "../controllers/jobs.js";
+
 import { checkUserEmail } from "../middleware/user/checkUserEmail.js";
 import {
   upload,
@@ -31,6 +33,7 @@ userRouter.post(
 );
 userRouter.post("/logIn", logIn);
 userRouter.get("/:id", getUser);
+userRouter.get("/:userId/getJobs", getJobs);
 userRouter.get("/:userId/job/:jobId/viewApplication/:id", viewApplication);
 userRouter.get("/:userId/getApplications", getApplications);
 userRouter.post("/jobs/:jobId/apply", apply);

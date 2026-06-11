@@ -47,22 +47,21 @@ const SignUpForm = () => {
       formData.set("niche", data.niche);
       formData.set("description", data.description);
       formData.set("profileImg", data.profileImg ? data.profileImg[0] : "");
-      console.log('creating profile')
+      console.log("creating profile");
       const signUp = await api.post("/company/signUp", formData, {
         withCredentials: true,
       });
       console.log(signUp);
       const { id } = signUp.data;
-      navigate(`/companies/${id}/profile`);
+      navigate(`/companies/${id}/dashboard`);
     } catch (error) {
       if (error instanceof AxiosError) {
         toast(error.response?.data.message);
-        return setIsLoading(false)
-        
+        return setIsLoading(false);
       }
       if (error instanceof Error) {
         toast(error.message);
-        return setIsLoading(false)
+        return setIsLoading(false);
       }
     }
   };

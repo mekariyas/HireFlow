@@ -19,3 +19,12 @@ export interface IJobForm {
   title: string;
   description: string;
 }
+
+export interface IJob {
+  id: number;
+  title: string;
+  description: string;
+  locationType: string;
+  jobType: string;
+  status: string;
+}

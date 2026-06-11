@@ -8,6 +8,8 @@ import {
   getApplication,
   logOut,
 } from "../controllers/company.js";
+import { getCompanyListings } from "../controllers/jobs.js";
+
 import {
   upload,
   uploadMiddleWare,
@@ -28,6 +30,7 @@ companyRouter.post(
 companyRouter.get("/:id", getProfile);
 companyRouter.post("/login", logIn);
 companyRouter.post("/postJob", postJob);
+companyRouter.get("/:id/listings", getCompanyListings);
 companyRouter.get("/jobs/:jobId/applications", getApplications);
 companyRouter.get(
   "/application/:applicationId/applicant/:applicantId",

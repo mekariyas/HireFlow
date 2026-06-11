@@ -89,6 +89,9 @@ export const getProfile = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Error, Incomplete data" });
     }
 
+    if (!Number(id)) {
+      return res.status(400).json({ message: "Invalid user" });
+    }
     const company = await db
       .select({
         id: companyTable.id,
@@ -120,6 +123,7 @@ export const getProfile = async (req: Request, res: Response) => {
 export const postJob = async (req: Request, res: Response) => {
   try {
     const { title, description, location, jobType, companyId } = req.body;
+
     if (!title || !description || !companyId || !location || !jobType) {
       return res.status(400).json({ message: "Error, Incomplete data" });
     }
@@ -133,7 +137,6 @@ export const postJob = async (req: Request, res: Response) => {
     const company = await db
       .select({
         id: companyTable.id,
-        niche: companyTable.niche,
       })
       .from(companyTable)
       .where(eq(companyTable.id, id))
@@ -155,6 +158,7 @@ export const postJob = async (req: Request, res: Response) => {
 
     return res.status(201).json({ message: "Job Posted" });
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

@@ -31,16 +31,17 @@ const JobForm = ({
   const handleJobPost: SubmitHandler<IJobForm> = async (data) => {
     try {
       setIsPosting(true);
-      const formData = new FormData();
-      formData.set("title", data.title);
-      formData.set("description", data.description);
-      formData.set("location", data.location);
-      formData.set("jobType", data.jobType);
-      formData.set("companyId", companyId?.toString() || "");
-      const jobPost = await api.post("/company/postJob", formData, {
+      const jobData = {
+        title: data.title,
+        description: data.description,
+        location: data.location,
+        jobType: data.jobType,
+        companyId: companyId?.toString() || "",
+      };
+      const jobPost = await api.post("/company/postJob", jobData, {
         withCredentials: true,
       });
-      toast(jobPost.data.data.message);
+      toast(jobPost.data.message);
       setIsPosting(false);
       handleFormVisibility();
     } catch (error) {
@@ -109,10 +110,10 @@ const JobForm = ({
             Select job type
           </NativeSelectOption>
 
-          <NativeSelectOption value="Remote">Full-time</NativeSelectOption>
-          <NativeSelectOption value="Hybrid">Part-time</NativeSelectOption>
-          <NativeSelectOption value="On-site">Contract</NativeSelectOption>
-          <NativeSelectOption value="On-site">Internship</NativeSelectOption>
+          <NativeSelectOption value="Full-time">Full-time</NativeSelectOption>
+          <NativeSelectOption value="Part-time">Part-time</NativeSelectOption>
+          <NativeSelectOption value="Contract">Contract</NativeSelectOption>
+          <NativeSelectOption value="Internship">Internship</NativeSelectOption>
         </NativeSelect>
         {errors.jobType && (
           <span className="text-red-600">This field is required</span>
