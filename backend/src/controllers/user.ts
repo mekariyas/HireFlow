@@ -140,10 +140,21 @@ const getUser = async (req: Request, res: Response) => {
 
 const apply = async (req: Request, res: Response) => {
   try {
-    const { userId, jobId, status } = req.body;
-    if (!userId || jobId || !status) {
+    console.log("this controller is called");
+    const { userId } = req.body;
+
+    const { jobId } = req.params;
+
+    if (!userId || !jobId) {
       return res.status(400).json({ message: "Incomplete Data" });
     }
+
+    if (isNaN(Number(userId)) || isNaN(Number(jobId))) {
+      return res
+        .status(400)
+        .json({ message: "Error. Couldn't apply, invalid user information" });
+    }
+
     const applications = await db
       .select()
       .from(applicationTable)
@@ -221,7 +232,7 @@ const logOut = (req: Request, res: Response) => {
     if (!userCookie) {
       return res
         .status(401)
-        .json({ message: "Unauthorized access, Cookie not found" });
+        .json({ message: "Unauthorized access, cannot carry out action" });
     }
     res.clearCookie(userCookie);
     return res.status(200).json({ message: "successfully logged out" });

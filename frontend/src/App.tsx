@@ -13,11 +13,13 @@ import Settings from "./shared/pages/Settings";
 import Signup from "./company/pages/signup";
 import Login from "./company/pages/login";
 import CompanyProfile from "./company/pages/CompanyProfile";
+import Applicants from "./company/pages/Applicants";
+import Listings from "./company/pages/Listings";
 //user
 import UserSignup from "./users/pages/signup";
 import UserLogin from "./users/pages/login";
 import UserProfile from "./users/pages/UserProfile";
-
+import Jobs from "./users/pages/Jobs";
 const App = () => {
   const router = createBrowserRouter([
     {
@@ -38,21 +40,31 @@ const App = () => {
           path: "/companies",
           children: [
             {
-              path: "/companies/signup",
+              path: "signup",
               element: <Signup />,
             },
             {
-              path: "/companies/login",
+              path: "login",
               element: <Login />,
             },
             {
-              path: "/companies/:companyId/profile",
+              path: ":companyId/dashboard",
               element: <Dashboard />,
-              children: [{ index: true, element: <CompanyProfile /> }],
-            },
-            {
-              path: "/companies/company/Settings",
-              element: <Settings />,
+              children: [
+                { index: true, element: <CompanyProfile /> },
+                {
+                  path: "settings",
+                  element: <Settings />,
+                },
+                {
+                  path: "listings",
+                  element: <Listings />,
+                },
+                {
+                  path: "listings/applicants/?jobId=:jobId",
+                  element: <Applicants />,
+                },
+              ],
             },
           ],
         },
@@ -62,15 +74,21 @@ const App = () => {
         {
           path: "/user",
           children: [
-            { path: "/user/signUp", element: <UserSignup /> },
+            { path: "signUp", element: <UserSignup /> },
             {
-              path: "/user/login",
+              path: "login",
               element: <UserLogin />,
             },
             {
-              path: "/user/:userId/profile",
+              path: ":userId/dashboard",
               element: <Dashboard />,
-              children: [{ index: true, element: <UserProfile /> }],
+              children: [
+                { index: true, element: <UserProfile /> },
+                {
+                  path: "jobs",
+                  element: <Jobs />,
+                },
+              ],
             },
           ],
         },

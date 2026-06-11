@@ -36,7 +36,7 @@ const LoginForm = () => {
         { withCredentials: true },
       );
       const { id } = logIn.data;
-      navigate(`/companies/${id}/profile`);
+      navigate(`/companies/${id}/dashboard`);
     } catch (error) {
       if (error instanceof AxiosError) {
         toast(error.response?.data.message);

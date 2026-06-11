@@ -14,3 +14,15 @@ export interface ISignIn {
   email: string;
   password: string;
 }
+
+export interface Ijobs {
+  id: number;
+  title: string;
+  name: string;
+  profileURL: string;
+  description: string;
+  jobType: string;
+  createdAt: string;
+  location: string;
+  companyId: number;
+}
