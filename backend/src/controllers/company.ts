@@ -14,9 +14,6 @@ const db = drizzle(process.env.DATABASE_URL!);
 
 export const signUp = async (req: Request, res: Response) => {
   try {
-    // console.log("Controller start");
-    // console.log(req.body);
-    // return;
     const { name, email, password, niche, role, description, profileImg } =
       req.body;
 
@@ -171,35 +168,25 @@ export const getApplications = async (req: Request, res: Response) => {
     }
 
     const applications = await db
-      .select()
+      .select({
+        id: applicationTable.id,
+        createdAt: applicationTable.createdAt,
+        status: applicationTable.status,
+        jobId: applicationTable.jobId,
+        firstName: usersTable.first_name,
+        lastName: usersTable.last_name,
+        skills: usersTable.skills,
+        cvUrl: usersTable.CVurl,
+        profileURL: usersTable.profileURL,
+      })
       .from(applicationTable)
+      .innerJoin(usersTable, eq(applicationTable.applicantId, usersTable.id))
       .where(eq(applicationTable.id, Number(jobId)));
 
     if (applications.length == 0) {
       return res.status(404).json({ message: "Applications not found" });
     }
     return res.status(200).json({ applications });
-  } catch (error) {
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-export const getApplication = async (req: Request, res: Response) => {
-  try {
-    const { applicationId, applicantId } = req.params;
-
-    if (!applicationId || !applicantId) {
-      return res.status(400).json({ message: "Incomplete Data" });
-    }
-    const application = await db
-      .select()
-      .from(applicationTable)
-      .where(eq(applicationTable.id, Number(applicationId)))
-      .fullJoin(usersTable, eq(applicationTable.applicantId, usersTable.id));
-    if (application.length === 0) {
-      return res.status(404).json({ message: "Application not found" });
-    }
-    return res.status(200).json({ application });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });
   }

@@ -61,7 +61,7 @@ const App = () => {
                   element: <Listings />,
                 },
                 {
-                  path: "listings/applicants/?jobId=:jobId",
+                  path: "listings/applicants",
                   element: <Applicants />,
                 },
               ],
@@ -95,10 +95,14 @@ const App = () => {
         //end of user routes
       ],
     },
+    {
+      path: "*",
+      element: <p>Unknown page</p>,
+    },
   ]);
   return (
     <>
-      <Toaster />
+      <Toaster className="mx-auto relative top-30 z-50" />
       <RouterProvider router={router} />
     </>
   );

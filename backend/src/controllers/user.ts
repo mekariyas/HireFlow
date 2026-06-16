@@ -140,7 +140,6 @@ const getUser = async (req: Request, res: Response) => {
 
 const apply = async (req: Request, res: Response) => {
   try {
-    console.log("this controller is called");
     const { userId } = req.body;
 
     const { jobId } = req.params;
