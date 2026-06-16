@@ -17,6 +17,13 @@ import {
   uploadMiddleWare,
 } from "../middleware/user/multer-cloudinary.js";
 
+import {
+  signUpSanitize,
+  logInSanitize,
+  getProfileSanitize,
+  applySanitize,
+} from "../middleware/user/auth/validation.js";
+
 const userRouter = express.Router();
 
 userRouter.post(
@@ -27,15 +34,16 @@ userRouter.post(
       { name: "cv", maxCount: 1 },
     ]),
     uploadMiddleWare,
+    signUpSanitize,
     checkUserEmail,
   ],
   signUp,
 );
-userRouter.post("/logIn", logIn);
-userRouter.get("/:id", getUser);
+userRouter.post("/logIn", logInSanitize, logIn);
+userRouter.get("/:id", getProfileSanitize, getUser);
 userRouter.get("/:userId/getJobs", getJobs);
 userRouter.get("/:userId/job/:jobId/viewApplication/:id", viewApplication);
 userRouter.get("/:userId/getApplications", getApplications);
-userRouter.post("/jobs/:jobId/apply", apply);
+userRouter.post("/jobs/:jobId/apply", applySanitize, apply);
 userRouter.get("/logOut", logOut);
 export default userRouter;

@@ -5,16 +5,25 @@ import {
   getProfile,
   postJob,
   getApplications,
-  getApplication,
   logOut,
 } from "../controllers/company.js";
+
 import { getCompanyListings } from "../controllers/jobs.js";
 
 import {
   upload,
   uploadMiddleWare,
 } from "../middleware/company/multer-cloudinary.js";
+
 import { checkCompanyEmail } from "../middleware/company/checkCompanyEmail.js";
+import {
+  signUpSanitize,
+  logInSanitize,
+  JobPostingSanitize,
+  getProfileSanitize,
+  listingsSanitize,
+  applicantsSanitize,
+} from "../middleware/company/auth/validation.js";
 
 const companyRouter = express.Router();
 
@@ -23,18 +32,19 @@ companyRouter.post(
   [
     upload.fields([{ name: "profileImg", maxCount: 1 }]),
     uploadMiddleWare,
+    signUpSanitize,
     checkCompanyEmail,
   ],
   signUp,
 );
-companyRouter.get("/:id", getProfile);
-companyRouter.post("/login", logIn);
-companyRouter.post("/postJob", postJob);
-companyRouter.get("/:id/listings", getCompanyListings);
-companyRouter.get("/jobs/:jobId/applications", getApplications);
+companyRouter.get("/:id", getProfileSanitize, getProfile);
+companyRouter.post("/login", logInSanitize, logIn);
+companyRouter.post("/postJob", JobPostingSanitize, postJob);
+companyRouter.get("/:id/listings", listingsSanitize, getCompanyListings);
 companyRouter.get(
-  "/application/:applicationId/applicant/:applicantId",
-  getApplication,
+  "/jobs/:jobId/applications",
+  applicantsSanitize,
+  getApplications,
 );
 companyRouter.get("/logout", logOut);
 

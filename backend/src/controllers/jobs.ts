@@ -11,6 +11,8 @@ import {
 
 const db = drizzle(process.env.DATABASE_URL!);
 
+//company controller for personal job listing
+
 export const getCompanyListings = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -34,6 +36,8 @@ export const getCompanyListings = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Internal Server error" });
   }
 };
+
+//user controller for jobs
 
 export const getJobs = async (req: Request, res: Response) => {
   try {

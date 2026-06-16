@@ -27,4 +27,17 @@ export interface IJob {
   locationType: string;
   jobType: string;
   status: string;
+  companyId: number;
+}
+
+export interface IApplication {
+  id: number;
+  jobId: number;
+  createdAt: string;
+  firstName: string;
+  lastName: string;
+  skills: string;
+  profileURL: string;
+  cvURL: string;
+  status: string;
 }
