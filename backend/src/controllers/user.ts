@@ -4,7 +4,7 @@ import type { Request, Response } from "express";
 import { usersTable, applicationTable } from "../db/schema.js";
 import { eq, and } from "drizzle-orm";
 import bcrypt from "bcrypt";
-
+import jwt from "jsonwebtoken";
 const db = drizzle(process.env.DATABASE_URL!);
 
 const signUp = async (req: Request, res: Response) => {
@@ -59,9 +59,30 @@ const signUp = async (req: Request, res: Response) => {
       })
       .returning();
 
-    return res
-      .status(201)
-      .json({ message: "Account Created", id: newUser[0]?.id });
+    const accessToken = jwt.sign(
+      { email: email, role: role },
+      process.env.USER_ACCESS_TOKEN_SECRET!,
+      { expiresIn: "7d" },
+    );
+
+    const refreshToken = jwt.sign(
+      { email, role },
+      process.env.USER_REFRESH_TOKEN_SECRET!,
+      { expiresIn: "7d" },
+    );
+
+    res.cookie("userToken", refreshToken, {
+      maxAge: 604800000,
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    return res.status(201).json({
+      message: "Account Created",
+      id: newUser[0]?.id,
+      accessToken: accessToken,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -79,12 +100,13 @@ const logIn = async (req: Request, res: Response) => {
         id: usersTable.id,
         email: usersTable.email,
         password: usersTable.password,
+        role: usersTable.role,
       })
       .from(usersTable)
       .where(eq(usersTable.email, userEmail))
       .limit(1);
     const foundUser:
-      | { email: string; password: string; id: number }
+      | { email: string; password: string; id: number; role: string }
       | undefined = user[0];
     if (!foundUser?.email) {
       return res.status(404).json({ message: "user not found" });
@@ -93,10 +115,29 @@ const logIn = async (req: Request, res: Response) => {
     if (!userAuth) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
+    const accessToken = jwt.sign(
+      { email: foundUser.email, role: foundUser.role },
+      process.env.USER_ACCESS_TOKEN_SECRET!,
+      { expiresIn: "15m" },
+    );
 
-    return res
-      .status(200)
-      .json({ message: "Successfully logged in", id: foundUser.id });
+    const refreshToken = jwt.sign(
+      { email: foundUser.email, role: foundUser.role },
+      process.env.USER_REFRESH_TOKEN_SECRET!,
+      { expiresIn: "7d" },
+    );
+
+    res.cookie("userToken", refreshToken, {
+      maxAge: 604800000,
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+    return res.status(200).json({
+      message: "Successfully logged in",
+      id: foundUser.id,
+      accessToken: accessToken,
+    });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });
   }

@@ -25,6 +25,8 @@ import {
   applicantsSanitize,
 } from "../middleware/company/auth/validation.js";
 
+import { authorizationMiddleWare } from "../middleware/company/auth/authorization.js";
+
 const companyRouter = express.Router();
 
 companyRouter.post(
@@ -37,12 +39,28 @@ companyRouter.post(
   ],
   signUp,
 );
-companyRouter.get("/:id", getProfileSanitize, getProfile);
 companyRouter.post("/login", logInSanitize, logIn);
-companyRouter.post("/postJob", JobPostingSanitize, postJob);
-companyRouter.get("/:id/listings", listingsSanitize, getCompanyListings);
+companyRouter.get(
+  "/:id",
+  authorizationMiddleWare,
+  getProfileSanitize,
+  getProfile,
+);
+companyRouter.post(
+  "/postJob",
+  authorizationMiddleWare,
+  JobPostingSanitize,
+  postJob,
+);
+companyRouter.get(
+  "/:id/listings",
+  authorizationMiddleWare,
+  listingsSanitize,
+  getCompanyListings,
+);
 companyRouter.get(
   "/jobs/:jobId/applications",
+  authorizationMiddleWare,
   applicantsSanitize,
   getApplications,
 );
