@@ -1,4 +1,5 @@
 import "dotenv/config";
+import jwt from "jsonwebtoken";
 import type { Request, Response } from "express";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { eq, and, sql, or, desc, ilike } from "drizzle-orm";

@@ -24,6 +24,8 @@ import {
   applySanitize,
 } from "../middleware/user/auth/validation.js";
 
+import { authorizationMiddleWare } from "../middleware/user/auth/authorization.js";
+
 const userRouter = express.Router();
 
 userRouter.post(
@@ -40,10 +42,23 @@ userRouter.post(
   signUp,
 );
 userRouter.post("/logIn", logInSanitize, logIn);
-userRouter.get("/:id", getProfileSanitize, getUser);
-userRouter.get("/:userId/getJobs", getJobs);
-userRouter.get("/:userId/job/:jobId/viewApplication/:id", viewApplication);
-userRouter.get("/:userId/getApplications", getApplications);
-userRouter.post("/jobs/:jobId/apply", applySanitize, apply);
+userRouter.get("/:id", authorizationMiddleWare, getProfileSanitize, getUser);
+userRouter.get("/:userId/getJobs", authorizationMiddleWare, getJobs);
+userRouter.get(
+  "/:userId/job/:jobId/viewApplication/:id",
+  authorizationMiddleWare,
+  viewApplication,
+);
+userRouter.get(
+  "/:userId/getApplications",
+  authorizationMiddleWare,
+  getApplications,
+);
+userRouter.post(
+  "/jobs/:jobId/apply",
+  authorizationMiddleWare,
+  applySanitize,
+  apply,
+);
 userRouter.get("/logOut", logOut);
 export default userRouter;

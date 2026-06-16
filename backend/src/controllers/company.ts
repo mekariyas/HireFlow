@@ -1,4 +1,5 @@
 import "dotenv/config";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import type { Request, Response } from "express";
 import { drizzle } from "drizzle-orm/node-postgres";
