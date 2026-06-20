@@ -1,6 +1,5 @@
 import "dotenv/config";
-import jwt from "jsonwebtoken";
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { eq, and, sql, or, desc, ilike } from "drizzle-orm";
 import {
@@ -12,11 +11,12 @@ import {
 
 const db = drizzle(process.env.DATABASE_URL!);
 
-//company controller for personal job listing
+//company-job  controllers
 
 export const getCompanyListings = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const { accessToken } = req.body;
     if (!id) {
       return res.status(400).json({ message: "Error, Incomplete data" });
     }
@@ -32,17 +32,83 @@ export const getCompanyListings = async (req: Request, res: Response) => {
     if (jobs.length == 0) {
       return res.status(200).json({ message: "Jobs not found" });
     }
-    return res.status(200).json({ jobs });
+    return res.status(200).json({ jobs, accessToken });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server error" });
   }
 };
 
-//user controller for jobs
+export const editJob = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { title, description, location, jobType, jobId, accessToken } =
+      req.body;
+
+    if (
+      !jobId ||
+      isNaN(Number(jobId)) ||
+      !title ||
+      !description ||
+      !location ||
+      !jobType
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Error, data is incomplete or wrong" });
+    }
+
+    await db
+      .update(jobsTable)
+      .set({
+        title: title,
+        description: description,
+        locationType: location,
+        jobType: jobType,
+      })
+      .where(eq(jobsTable.id, Number(jobId)));
+
+    return res
+      .status(200)
+      .json({ message: "Job edited successfully", accessToken });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server error" });
+  }
+};
+
+export const deleteJob = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const {
+      jobId,
+      accessToken,
+    } = req.body;
+
+    if (isNaN(Number(jobId))) {
+      return res
+        .status(400)
+        .json({ message: "Invalid job information, unable to delete" });
+    }
+
+    await db.delete(jobsTable).where(eq(jobsTable.id, Number(jobId)));
+
+    res.status(200).json({ message: "job deleted successfully", accessToken });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server error" });
+  }
+};
+
+//user-job related controllers
 
 export const getJobs = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
+    const { accessToken } = req.body;
     if (!userId || isNaN(Number(userId))) {
       return res.status(400).json({
         message: "Invalid user data, unable to get job posts",
@@ -85,10 +151,9 @@ export const getJobs = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       jobs,
+      accessToken,
     });
   } catch (error) {
-    console.error(error);
-
     return res.status(500).json({
       message: "Internal Server Error",
     });

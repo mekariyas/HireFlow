@@ -158,3 +158,49 @@ export const applicantsSanitize = async (
     return res.status(500).json({ message: "Internal Server error" });
   }
 };
+
+
+const editJob = z.object({
+  email: z.string().trim(),
+  role: z.string().trim(),
+  title: z.string("error,no title provided"),
+  description: z.string("error, no valid job description"),
+  jobType: z.string("error, no valid job type provided"),
+  location: z.string("error, no valid location provided"),
+})
+
+export const editJobSanitize = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = editJob.safeParse(req.body);
+    if (!result.success) {
+      return res.status(400).json({
+        message: z.prettifyError(result.error)? z.prettifyError(result.error) : "Unauthorized, Invalid data" ,
+      });
+    }
+    req.body = result.data;
+    next();
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server error" });
+  }
+}
+
+const deleteJob = z.object({
+  email: z.string().trim(),
+  role: z.string().trim(),
+  jobId: z.string().trim(),
+})
+
+export const deleteJobSanitize  =  async ( req: Request , res: Response, next: NextFunction ) => {
+  try {
+    const result = deleteJob.safeParse(req.body);
+    if(!result.success){
+      return res.status(400).json({
+        message:"Unauthorized access, unable to delete job"
+      })
+    }
+    req.body = result.data;
+    next();
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server error" });
+  }
+}

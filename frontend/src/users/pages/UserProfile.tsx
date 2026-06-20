@@ -14,7 +14,7 @@ const UserProfile = () => {
   const { userId } = useParams();
   const { error, isLoading, data } = useQuery({
     queryKey: ["userInfo"],
-    queryFn: () => api.get(`/user/${userId}`),
+    queryFn: () => api.get(`/user/${userId}`, { withCredentials: true }),
   });
   if (isLoading) {
     return <Spinner />;
