@@ -8,7 +8,7 @@ import {
   logOut,
 } from "../controllers/company.js";
 
-import { getCompanyListings } from "../controllers/jobs.js";
+import { getCompanyListings, editJob, deleteJob } from "../controllers/jobs.js";
 
 import {
   upload,
@@ -23,7 +23,11 @@ import {
   getProfileSanitize,
   listingsSanitize,
   applicantsSanitize,
+  editJobSanitize,
+  deleteJobSanitize
 } from "../middleware/company/auth/validation.js";
+
+import { tokenRefreshMiddleWare } from "../middleware/TokenRefresh.js";
 
 import { authorizationMiddleWare } from "../middleware/company/auth/authorization.js";
 
@@ -44,25 +48,44 @@ companyRouter.get(
   "/:id",
   authorizationMiddleWare,
   getProfileSanitize,
+  tokenRefreshMiddleWare,
   getProfile,
 );
 companyRouter.post(
   "/postJob",
   authorizationMiddleWare,
   JobPostingSanitize,
+  tokenRefreshMiddleWare,
   postJob,
 );
 companyRouter.get(
   "/:id/listings",
   authorizationMiddleWare,
   listingsSanitize,
+  tokenRefreshMiddleWare,
   getCompanyListings,
 );
 companyRouter.get(
   "/jobs/:jobId/applications",
   authorizationMiddleWare,
   applicantsSanitize,
+  tokenRefreshMiddleWare,
   getApplications,
+);
+companyRouter.put(
+  "/editJob",
+  authorizationMiddleWare,
+  editJobSanitize,
+  tokenRefreshMiddleWare,
+  editJob,
+);
+
+companyRouter.delete(
+  "/deleteJob",
+  authorizationMiddleWare,
+  deleteJobSanitize,
+  tokenRefreshMiddleWare,
+  deleteJob,
 );
 companyRouter.get("/logout", logOut);
 

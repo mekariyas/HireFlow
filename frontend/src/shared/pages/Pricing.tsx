@@ -176,18 +176,6 @@ const Pricing = () => {
                 )}
               </div>
 
-              {/* CTA */}
-              <a
-                href={plan.ctaLink}
-                className={`text-center text-sm font-bold py-3 rounded-xl transition-colors ${
-                  plan.featured
-                    ? "bg-white text-indigo-600 hover:bg-indigo-50"
-                    : "bg-indigo-600 text-white hover:bg-indigo-700"
-                }`}
-              >
-                {plan.cta}
-              </a>
-
               {/* Features */}
               <div className="flex flex-col gap-2.5">
                 {plan.features.map((f) => (
@@ -243,7 +231,7 @@ const Pricing = () => {
         <div className="max-w-3xl mx-auto px-6 py-16 text-center flex flex-col items-center gap-6">
           <h2 className="text-3xl font-extrabold text-white">Start hiring smarter today</h2>
           <p className="text-indigo-200">No credit card required. Up and running in minutes.</p>
-          <a href="/signup" className="bg-white text-indigo-600 font-bold px-10 py-3 rounded-xl hover:bg-indigo-50 transition-colors">
+          <a href="/companies/signup" className="bg-white text-indigo-600 font-bold px-10 py-3 rounded-xl hover:bg-indigo-50 transition-colors">
             Get Started Free
           </a>
         </div>

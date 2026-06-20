@@ -38,9 +38,27 @@ export const signUp = async (req: Request, res: Response) => {
         profileURL: profileImg,
       })
       .returning();
+    const accessToken = jwt.sign(
+      { email: email, role: role },
+      process.env.COMPANY_ACCESS_TOKEN_SECRET!,
+      { expiresIn: "7d" },
+    );
+
+    const refreshToken = jwt.sign(
+      { email, role },
+      process.env.COMPANY_REFRESH_TOKEN_SECRET!,
+      { expiresIn: "7d" },
+    );
+
+    res.cookie("companyToken", refreshToken, {
+      maxAge: 604800000,
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
     return res
       .status(201)
-      .json({ message: "Profile created", id: newCompany[0]?.id });
+      .json({ message: "Profile created", id: newCompany[0]?.id, accessToken });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -57,12 +75,13 @@ export const logIn = async (req: Request, res: Response) => {
         id: companyTable.id,
         email: companyTable.email,
         password: companyTable.password,
+        role: companyTable.role,
       })
       .from(companyTable)
       .where(eq(companyTable.email, email));
 
     const foundCompany:
-      | { email: string; password: string; id: number }
+      | { email: string; password: string; id: number; role: string }
       | undefined = company[0];
     if (!foundCompany?.email) {
       return res.status(404).json({ message: "user not found" });
@@ -72,9 +91,29 @@ export const logIn = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    return res
-      .status(200)
-      .json({ message: "Successfully logged in", id: foundCompany.id });
+    const accessToken = jwt.sign(
+      { email: foundCompany.email, role: foundCompany.role },
+      process.env.COMPANY_ACCESS_TOKEN_SECRET!,
+      { expiresIn: "15m" },
+    );
+
+    const refreshToken = jwt.sign(
+      { email: foundCompany.email, role: foundCompany.role },
+      process.env.COMPANY_REFRESH_TOKEN_SECRET!,
+      { expiresIn: "7d" },
+    );
+
+    res.cookie("companyToken", refreshToken, {
+      maxAge: 604800000,
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+    return res.status(200).json({
+      message: "Successfully logged in",
+      id: foundCompany.id,
+      accessToken: accessToken,
+    });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -83,6 +122,7 @@ export const logIn = async (req: Request, res: Response) => {
 export const getProfile = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const { accessToken } = req.body;
     if (!id) {
       return res.status(400).json({ message: "Error, Incomplete data" });
     }
@@ -110,6 +150,7 @@ export const getProfile = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       message: "user found",
+      accessToken,
       ...foundCompany,
     });
   } catch (error: any) {
@@ -120,7 +161,8 @@ export const getProfile = async (req: Request, res: Response) => {
 
 export const postJob = async (req: Request, res: Response) => {
   try {
-    const { title, description, location, jobType, companyId } = req.body;
+    const { title, description, location, jobType, companyId, accessToken } =
+      req.body;
 
     if (!title || !description || !companyId || !location || !jobType) {
       return res.status(400).json({ message: "Error, Incomplete data" });
@@ -154,7 +196,7 @@ export const postJob = async (req: Request, res: Response) => {
       companyId: foundCompany.id,
     });
 
-    return res.status(201).json({ message: "Job Posted" });
+    return res.status(201).json({ message: "Job Posted", accessToken });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -164,6 +206,7 @@ export const postJob = async (req: Request, res: Response) => {
 export const getApplications = async (req: Request, res: Response) => {
   try {
     const { jobId } = req.params;
+    const { accessToken } = req.body;
     if (!jobId) {
       return res.status(400).json({ message: "Error, Incomplete data" });
     }
@@ -187,7 +230,7 @@ export const getApplications = async (req: Request, res: Response) => {
     if (applications.length == 0) {
       return res.status(404).json({ message: "Applications not found" });
     }
-    return res.status(200).json({ applications });
+    return res.status(200).json({ applications, accessToken });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -195,13 +238,13 @@ export const getApplications = async (req: Request, res: Response) => {
 
 export const logOut = async (req: Request, res: Response) => {
   try {
-    const { companyCookie } = req.cookies.companyCookie;
-    if (!companyCookie) {
+    const companyToken = req.cookies?.companyToken;
+    if (!companyToken) {
       return res
         .status(401)
-        .json({ message: "Unauthorized access, Cookie not found" });
+        .json({ message: "Unauthorized access, cannot carry out action" });
     }
-    res.clearCookie(companyCookie);
+    res.clearCookie(companyToken);
     return res.status(200).json({ message: "successfully logged out" });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });

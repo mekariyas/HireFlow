@@ -146,6 +146,7 @@ const logIn = async (req: Request, res: Response) => {
 const getUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const { accessToken } = req.body;
     if (!id) {
       return res.status(400).json({ message: "Error, Incomplete data" });
     }
@@ -172,6 +173,7 @@ const getUser = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       message: "user found",
+      accessToken,
       ...foundUser,
     });
   } catch (error) {
@@ -181,7 +183,7 @@ const getUser = async (req: Request, res: Response) => {
 
 const apply = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.body;
+    const { userId, accessToken } = req.body;
 
     const { jobId } = req.params;
 
@@ -212,7 +214,9 @@ const apply = async (req: Request, res: Response) => {
     await db
       .insert(applicationTable)
       .values({ applicantId: Number(userId), jobId: Number(jobId) });
-    return res.status(201).json({ message: "Successfully applied" });
+    return res
+      .status(201)
+      .json({ message: "Successfully applied", accessToken });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -221,6 +225,7 @@ const apply = async (req: Request, res: Response) => {
 const getApplications = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
+    const { accessToken } = req.body;
     if (!userId) {
       return res.status(400).json({ message: "Incomplete Data" });
     }
@@ -233,7 +238,7 @@ const getApplications = async (req: Request, res: Response) => {
     }
     return res
       .status(200)
-      .json({ message: "Applications found", applications });
+      .json({ message: "Applications found", applications, accessToken });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -242,6 +247,7 @@ const getApplications = async (req: Request, res: Response) => {
 const viewApplication = async (req: Request, res: Response) => {
   try {
     const { id, userId, jobId } = req.params;
+    const { accessToken } = req.body;
     if (!id || !userId || !jobId) {
       return res.status(404).json({ message: "Error, not found" });
     }
@@ -258,9 +264,11 @@ const viewApplication = async (req: Request, res: Response) => {
     if (application.length === 0) {
       return res.status(404).json({ message: "no job applications found" });
     }
-    return res
-      .status(200)
-      .json({ message: "application found", application: application[0] });
+    return res.status(200).json({
+      message: "application found",
+      application: application[0],
+      accessToken,
+    });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }
@@ -268,13 +276,13 @@ const viewApplication = async (req: Request, res: Response) => {
 
 const logOut = (req: Request, res: Response) => {
   try {
-    const { userCookie } = req.cookies.userCookies;
-    if (!userCookie) {
+    const userToken = req.cookies?.userToken;
+    if (!userToken) {
       return res
         .status(401)
         .json({ message: "Unauthorized access, cannot carry out action" });
     }
-    res.clearCookie(userCookie);
+    res.clearCookie(userToken);
     return res.status(200).json({ message: "successfully logged out" });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });

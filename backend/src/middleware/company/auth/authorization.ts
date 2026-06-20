@@ -32,7 +32,7 @@ export const authorizationMiddleWare = async (
 };
 
 const validateRefreshToken = (req: Request, res: Response) => {
-  const refreshToken = req.cookies?.userToken;
+  const refreshToken = req.cookies?.companyToken;
   if (refreshToken) {
     return res.status(401).json({
       message: "Unauthorized access, signup or login",
