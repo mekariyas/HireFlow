@@ -10,6 +10,7 @@ export const authorizationMiddleWare = async (
   try {
     if (!accessToken) {
       validateRefreshToken(req, res);
+      next();
     } else {
       jwt.verify(
         accessToken,
@@ -19,8 +20,11 @@ export const authorizationMiddleWare = async (
             validateRefreshToken(req, res);
             next();
           } else {
-            req.body.email = decoded.email;
-            req.body.role = decoded.role;
+            req.body = {
+              ...req.body,
+              email: decoded.email,
+              role: decoded.role,
+            };
             next();
           }
         },
@@ -33,7 +37,7 @@ export const authorizationMiddleWare = async (
 
 const validateRefreshToken = (req: Request, res: Response) => {
   const refreshToken = req.cookies?.userToken;
-  if (refreshToken) {
+  if (!refreshToken) {
     return res.status(401).json({
       message: "Unauthorized access, signup or login",
       redirect: true,
@@ -49,8 +53,7 @@ const validateRefreshToken = (req: Request, res: Response) => {
             redirect: true,
           });
         }
-        req.body.email = decoded.email;
-        req.body.role = decoded.role;
+        req.body = { ...req.body, email: decoded.email, role: decoded.role };
       },
     );
   }

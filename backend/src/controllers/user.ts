@@ -144,6 +144,7 @@ const logIn = async (req: Request, res: Response) => {
 };
 
 const getUser = async (req: Request, res: Response) => {
+  console.log("i am here");
   try {
     const { id } = req.params;
     const { accessToken } = req.body;
@@ -173,10 +174,11 @@ const getUser = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       message: "user found",
-      accessToken,
+      accessToken: accessToken,
       ...foundUser,
     });
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -282,7 +284,10 @@ const logOut = (req: Request, res: Response) => {
         .status(401)
         .json({ message: "Unauthorized access, cannot carry out action" });
     }
-    res.clearCookie(userToken);
+    res.clearCookie("userToken", {
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
     return res.status(200).json({ message: "successfully logged out" });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });

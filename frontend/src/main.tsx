@@ -4,7 +4,7 @@ import "./index.css";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import Loading from "./Loading";
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 // eslint-disable-next-line react-refresh/only-export-components
 const App = lazy(() => import("./App.tsx"));

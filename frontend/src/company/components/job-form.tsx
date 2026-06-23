@@ -15,11 +15,8 @@ import { Textarea } from "../../components/ui/textarea";
 
 import api from "../../api/axios";
 import { toast } from "sonner";
-const JobForm = ({
-  handleFormVisibility,
-}: {
-  handleFormVisibility: () => void;
-}) => {
+
+const JobForm = ({ ...props }: IJobForm & { children?: React.ReactNode }) => {
   const { companyId } = useParams();
   const [isPosting, setIsPosting] = useState<boolean>(false);
   const {
@@ -43,7 +40,7 @@ const JobForm = ({
       });
       toast(jobPost.data.message);
       setIsPosting(false);
-      handleFormVisibility();
+      props.handleFormVisibility();
     } catch (error) {
       if (error instanceof AxiosError) {
         toast(error.response?.data.message);
@@ -56,7 +53,7 @@ const JobForm = ({
     }
   };
   return (
-    <section className="w-full pb-10 bg-white flex flex-col gap-4 items-center absolute z-[10] mt-10">
+    <section className="w-full pb-10 bg-white flex flex-col gap-4 items-center absolute z-10 mt-10">
       <form
         className="w-full lg:w-[45%] flex flex-col gap-4"
         onSubmit={handleSubmit(handleJobPost)}
@@ -65,6 +62,7 @@ const JobForm = ({
         <Input
           type="text"
           {...register("title", { required: true, minLength: 3 })}
+          defaultValue={props.title ?? ""}
         />
         {errors.title && (
           <span className="text-red-600">This field is required</span>
@@ -78,6 +76,7 @@ const JobForm = ({
             placeholder="Describe your company."
             className="h-64"
             {...register("description", { required: true })}
+            defaultValue={props.description ?? ""}
           />
           {errors.description && (
             <span className="text-red-600">This field is required</span>
@@ -85,7 +84,7 @@ const JobForm = ({
         </Field>
         <Label htmlFor="location">Location</Label>
         <NativeSelect
-          defaultValue=""
+          defaultValue={props.location ?? ""}
           {...register("location", { required: true })}
           className="w-full required:border-red-500"
         >
@@ -100,9 +99,9 @@ const JobForm = ({
         {errors.location && (
           <span className="text-red-600">This field is required</span>
         )}
-        <Label htmlFor="location">Job Type</Label>
+        <Label htmlFor="jobType">Job Type</Label>
         <NativeSelect
-          defaultValue=""
+          defaultValue={props.jobType ?? ""}
           {...register("jobType", { required: true })}
           className="w-full required:border-red-500"
         >
@@ -118,18 +117,22 @@ const JobForm = ({
         {errors.jobType && (
           <span className="text-red-600">This field is required</span>
         )}
-        <Button
-          type="submit"
-          className="w-full h-12 text-lg font-bold bg-slate-950 text-white rounded-md cursor-pointer"
-          disabled={isPosting}
-        >
-          Post
-        </Button>
+        {props.children ? (
+          <>{props.children}</>
+        ) : (
+          <Button
+            type="submit"
+            className="w-full h-12 text-lg font-bold bg-slate-950 text-white rounded-md cursor-pointer"
+            disabled={isPosting}
+          >
+            Post
+          </Button>
+        )}
       </form>
       <Button
         type="button"
         className="w-full lg:w-[45%] h-12 text-lg font-bold bg-red-950 text-white rounded-md cursor-pointer"
-        onClick={handleFormVisibility}
+        onClick={props.handleFormVisibility}
       >
         Cancel
       </Button>

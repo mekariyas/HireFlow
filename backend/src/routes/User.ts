@@ -42,6 +42,7 @@ userRouter.post(
   signUp,
 );
 userRouter.post("/logIn", logInSanitize, logIn);
+userRouter.get("/logout", logOut);
 userRouter.get("/:id", authorizationMiddleWare, getProfileSanitize, getUser);
 userRouter.get("/:userId/getJobs", authorizationMiddleWare, getJobs);
 userRouter.get(
@@ -60,5 +61,4 @@ userRouter.post(
   applySanitize,
   apply,
 );
-userRouter.get("/logOut", logOut);
 export default userRouter;
