@@ -67,6 +67,8 @@ export const signUp = async (req: Request, res: Response) => {
 export const logIn = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
+    console.log(email);
+    console.log(password);
     if (!email || !password) {
       return res.status(400).json({ message: "Error, Incomplete data" });
     }
@@ -244,9 +246,15 @@ export const logOut = async (req: Request, res: Response) => {
         .status(401)
         .json({ message: "Unauthorized access, cannot carry out action" });
     }
-    res.clearCookie(companyToken);
+    res.clearCookie("companyToken", {
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
     return res.status(200).json({ message: "successfully logged out" });
   } catch (error) {
+    console.log("logout error");
+    console.error(error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

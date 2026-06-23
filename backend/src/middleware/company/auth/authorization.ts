@@ -10,6 +10,7 @@ export const authorizationMiddleWare = async (
   try {
     if (!accessToken) {
       validateRefreshToken(req, res);
+      next();
     } else {
       jwt.verify(
         accessToken,
@@ -17,23 +18,29 @@ export const authorizationMiddleWare = async (
         (err: any, decoded: any) => {
           if (err) {
             validateRefreshToken(req, res);
-            next();
+            console.log("calling next");
+            return next();
           } else {
-            req.body.email = decoded.email;
-            req.body.role = decoded.role;
+            req.body = {
+              ...req.body,
+              email: decoded.email,
+              role: decoded.role,
+            };
             next();
           }
         },
       );
     }
   } catch (error) {
+    console.log("company auth error");
+    console.error(error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
 const validateRefreshToken = (req: Request, res: Response) => {
   const refreshToken = req.cookies?.companyToken;
-  if (refreshToken) {
+  if (!refreshToken) {
     return res.status(401).json({
       message: "Unauthorized access, signup or login",
       redirect: true,
@@ -44,13 +51,13 @@ const validateRefreshToken = (req: Request, res: Response) => {
       process.env.COMPANY_REFRESH_TOKEN_SECRET!,
       (err: any, decoded: any) => {
         if (err) {
+          console.error(err);
           return res.status(401).json({
             message: "Unauthorized access, signup or login",
-            redirect: true,
           });
         }
-        req.body.email = decoded.email;
-        req.body.role = decoded.role;
+
+        req.body = { ...req.body, email: decoded.email, role: decoded.role };
       },
     );
   }

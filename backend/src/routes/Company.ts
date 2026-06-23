@@ -24,7 +24,7 @@ import {
   listingsSanitize,
   applicantsSanitize,
   editJobSanitize,
-  deleteJobSanitize
+  deleteJobSanitize,
 } from "../middleware/company/auth/validation.js";
 
 import { tokenRefreshMiddleWare } from "../middleware/TokenRefresh.js";
@@ -44,6 +44,8 @@ companyRouter.post(
   signUp,
 );
 companyRouter.post("/login", logInSanitize, logIn);
+companyRouter.get("/logout", logOut);
+
 companyRouter.get(
   "/:id",
   authorizationMiddleWare,
@@ -87,6 +89,5 @@ companyRouter.delete(
   tokenRefreshMiddleWare,
   deleteJob,
 );
-companyRouter.get("/logout", logOut);
 
 export default companyRouter;

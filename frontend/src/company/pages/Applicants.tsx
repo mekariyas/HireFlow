@@ -41,6 +41,9 @@ const Applicants = () => {
   }
   console.log(data);
 
+  const getDownloadUrl = (url: string) => {
+    return url.replace("/upload/", "/upload/fl_attachment/");
+  };
   return (
     <section className="w-full flex flex-col gap-4 items-center mb-10">
       <section className="mb-8 mt-6">
@@ -81,16 +84,24 @@ const Applicants = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <section className="w-[80%] decoration-0 flex justify-center gap-10 items-center">
-                    <a className="w-40 h-10 bg-blue-950 flex items-center justify-center rounded-lg cursor-pointer text-white font-bold">
+                    <a
+                      href={getDownloadUrl(application.cvUrl)}
+                      className="w-40 h-10 bg-blue-950 flex items-center justify-center rounded-lg cursor-pointer text-white font-bold"
+                    >
                       {" "}
                       Download Resume
                     </a>
-                    <a className="w-40 h-10  bg-gray-700 flex items-center justify-center rounded-lg cursor-pointer text-white font-bold">
+                    <a
+                      href={application.cvUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-40 h-10  bg-gray-700 flex items-center justify-center rounded-lg cursor-pointer text-white font-bold"
+                    >
                       View Resume
                     </a>
                   </section>
-                  <section className="w-full flex justify-end-safe items-center">
-                    <p>Applied at: {application.createdAt}</p>
+                  <section className="w-full flex flex-col items-end-safe lg:flex-row lg:justify-end-safe gap-4 lg:items-center">
+                    {/* <p>Applied at: {application.createdAt}</p> */}
                     <p className="">
                       Status:{" "}
                       <span

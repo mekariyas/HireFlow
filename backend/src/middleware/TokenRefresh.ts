@@ -51,6 +51,8 @@ export const tokenRefreshMiddleWare = async (
       next();
     }
   } catch (error) {
+    console.log("token refresh error");
+    console.error(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

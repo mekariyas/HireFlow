@@ -14,10 +14,11 @@ export interface ISignUp {
 }
 
 export interface IJobForm {
-  location: string;
-  jobType: string;
-  title: string;
-  description: string;
+  handleFormVisibility: () => void;
+  title?: string;
+  description?: string;
+  location?: string;
+  jobType?: string;
 }
 
 export interface IJob {
@@ -38,6 +39,6 @@ export interface IApplication {
   lastName: string;
   skills: string;
   profileURL: string;
-  cvURL: string;
+  cvUrl: string;
   status: string;
 }

@@ -60,16 +60,21 @@ export const editJob = async (
         .json({ message: "Error, data is incomplete or wrong" });
     }
 
-    await db
+    const updatedJob = await db
       .update(jobsTable)
       .set({
         title: title,
         description: description,
         locationType: location,
         jobType: jobType,
+        updatedAt: new Date(),
       })
-      .where(eq(jobsTable.id, Number(jobId)));
+      .where(eq(jobsTable.id, Number(jobId)))
+      .returning();
 
+    if (updatedJob.length === 0) {
+      return res.status(403).json({ error: "Unauthorized or job not found" });
+    }
     return res
       .status(200)
       .json({ message: "Job edited successfully", accessToken });
@@ -84,10 +89,7 @@ export const deleteJob = async (
   next: NextFunction,
 ) => {
   try {
-    const {
-      jobId,
-      accessToken,
-    } = req.body;
+    const { jobId, accessToken } = req.body;
 
     if (isNaN(Number(jobId))) {
       return res
@@ -95,8 +97,13 @@ export const deleteJob = async (
         .json({ message: "Invalid job information, unable to delete" });
     }
 
-    await db.delete(jobsTable).where(eq(jobsTable.id, Number(jobId)));
-
+    const deletedJob = await db
+      .delete(jobsTable)
+      .where(eq(jobsTable.id, Number(jobId)))
+      .returning();
+    if (deletedJob.length === 0) {
+      return res.status(403).json({ error: "Unauthorized or job not found" });
+    }
     res.status(200).json({ message: "job deleted successfully", accessToken });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server error" });
