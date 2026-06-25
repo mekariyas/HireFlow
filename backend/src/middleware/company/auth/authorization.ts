@@ -51,7 +51,6 @@ const validateRefreshToken = (req: Request, res: Response) => {
       process.env.COMPANY_REFRESH_TOKEN_SECRET!,
       (err: any, decoded: any) => {
         if (err) {
-          console.error(err);
           return res.status(401).json({
             message: "Unauthorized access, signup or login",
           });

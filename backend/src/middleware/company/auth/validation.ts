@@ -16,8 +16,7 @@ const logIn = z.object({
   email: z.email("email: expected a string containing @").trim(),
   password: z
     .string("password: expected a string with a minimum length of 8 characters")
-    .trim()
-    .min(8),
+    .trim(),
 });
 
 //used a universal id schema because listingsSanitize, applicantsSanitize and profileSanitize all use id
@@ -172,12 +171,13 @@ export const applicantsSanitize = async (
 };
 
 const editJob = z.object({
-  email: z.string().email().trim(),
-  role: z.string().trim(),
-  title: z.string("error,no title provided"),
-  description: z.string("error, no valid job description"),
-  jobType: z.string("error, no valid job type provided"),
-  location: z.string("error, no valid location provided"),
+  jobId: z.number("Invalid job credential, unable to delete"),
+  email: z.email("Unable to carry out action, log in or sign up"),
+  role: z.string("Unable to carry out action, log in or sign up").trim(),
+  title: z.string("Error,no title provided").trim(),
+  description: z.string("Error, no valid job description").trim(),
+  jobType: z.string("Error, no valid job type provided").trim(),
+  location: z.string("Error, no valid location provided").trim(),
 });
 
 export const editJobSanitize = async (

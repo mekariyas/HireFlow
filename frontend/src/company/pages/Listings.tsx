@@ -1,26 +1,52 @@
+import { useState } from "react";
 import { AxiosError } from "axios";
 import { useParams, useNavigate } from "react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../../components/ui/accordion";
-
+import JobForm from "../components/job-form";
 import { Button } from "../../components/ui/button";
 import type { IJob } from "../types/company-types";
 import ErrorComponent from "../../shared/components/Error";
 import Spinner from "../../shared/components/Loading";
+import { toast } from "sonner";
 import api from "../../api/axios";
 
 const Listings = () => {
+  const [isEditVisible, setIsEditVisible] = useState<boolean>(false);
   const { companyId } = useParams();
   const navigate = useNavigate();
   const { error, isLoading, data } = useQuery({
     queryKey: ["listingInfo", companyId],
     queryFn: () => api.get(`/company/${companyId}/listings`),
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await api.delete("/company/deleteJob", { data: { jobId: id } });
+    },
+  });
+
+  const handleFormVisibility = () => {
+    setIsEditVisible(false);
+  };
+
+  const handleJobDelete = (id: number) => {
+    try {
+      deleteMutation.mutate(id);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return toast(error.response?.data.message);
+      }
+      if (error instanceof Error) {
+        return toast(error.message);
+      }
+    }
+  };
 
   if (isLoading) return <Spinner />;
 
@@ -57,7 +83,8 @@ const Listings = () => {
                 <p>{job.description}</p>
                 <section className="w-full mt-8 flex flex-col gap-6 lg:flex-row items-center justify-around font-bold">
                   <Button
-                    className="h-10 bg-green-800 font-bold text-lg text-white cursor-pointer"
+                    className={`h-10 ${deleteMutation.isPending || isEditVisible ? "bg-green-400" : "bg-green-800"} font-bold text-lg text-white cursor-pointer`}
+                    disabled={deleteMutation.isPending || isEditVisible}
                     onClick={() =>
                       navigate(
                         `/companies/${companyId}/dashboard/listings/applicants?jobId=${job.id}`,
@@ -66,13 +93,35 @@ const Listings = () => {
                   >
                     View Applicants
                   </Button>
-                  <Button className="w-30 h-10 bg-yellow-600 font-bold text-lg text-black cursor-pointer">
+                  <Button
+                    className={`w-30 h-10  ${deleteMutation.isPending || isEditVisible ? "bg-yellow-400 cursor-not-allowed" : "bg-yellow-600"}  font-bold text-lg text-black cursor-pointer`}
+                    onClick={() => setIsEditVisible(true)}
+                    disabled={deleteMutation.isPending}
+                  >
                     Edit Post
                   </Button>
-                  <Button className="w-30 h-10 bg-red-800 font-bold text-lg text-white cursor-pointer">
+                  <Button
+                    className={`w-30 h-10 ${deleteMutation.isPending || isEditVisible ? "bg-red-400 cursor-not-allowed" : "bg-red-800"} font-bold text-lg text-white cursor-pointer`}
+                    disabled={deleteMutation.isPending || isEditVisible}
+                    onClick={() => handleJobDelete(job.id)}
+                  >
                     Delete Post
                   </Button>
                 </section>
+                {isEditVisible && (
+                  <section className="w-full">
+                    <JobForm
+                      handleFormVisibility={handleFormVisibility}
+                      title={job.title}
+                      description={job.description}
+                      location={job.locationType}
+                      jobType={job.jobType}
+                      class={"static"}
+                      jobId={job.id}
+                      editVisible={isEditVisible}
+                    ></JobForm>
+                  </section>
+                )}
               </AccordionContent>
             </AccordionItem>
           ))}

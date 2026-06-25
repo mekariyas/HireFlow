@@ -19,6 +19,9 @@ export interface IJobForm {
   description?: string;
   location?: string;
   jobType?: string;
+  class?: string;
+  jobId: number;
+  editVisible: boolean;
 }
 
 export interface IJob {
