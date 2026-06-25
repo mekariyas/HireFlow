@@ -1,5 +1,6 @@
 # HireFlow
-A PERN job board platform that allows users to apply for jobs and companies to create jobs, view applicants, edit  and delte job posts.
+A PERN job board platform that allows users to apply for jobs and companies to create jobs, view applicants, edit  and delete job posts.
+It utilizes protect routes, file uploads for both user and companies.
 
 ## Tech Stack
  ### Front-end
@@ -15,6 +16,8 @@ A PERN job board platform that allows users to apply for jobs and companies to c
 - Express js
 - Typescript
 - Zod
+- Multer
+- Cloudinary SDK
 - Jsonwebtokens
 - Express rate limiter
 - Neon
