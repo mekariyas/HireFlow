@@ -6,6 +6,7 @@ A PERN job board platform that allows users to apply for jobs and companies to c
  - React
  - Tailwind CSS
  - Typescript
+ - Axios
  - React Query
  - React Hook Form
  - Zustand
@@ -14,6 +15,7 @@ A PERN job board platform that allows users to apply for jobs and companies to c
 - Express js
 - Typescript
 - Zod
+- Jsonwebtokens
 - Express rate limiter
 - Neon
 - Drizzle
