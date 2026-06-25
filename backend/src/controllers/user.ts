@@ -139,6 +139,8 @@ const logIn = async (req: Request, res: Response) => {
       accessToken: accessToken,
     });
   } catch (error) {
+    console.log("login controller error");
+    console.error(error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -278,6 +280,7 @@ const viewApplication = async (req: Request, res: Response) => {
 
 const logOut = (req: Request, res: Response) => {
   try {
+    console.log("you called for user log out");
     const userToken = req.cookies?.userToken;
     if (!userToken) {
       return res

@@ -45,11 +45,10 @@ const Jobs = () => {
       toast(apply.data.data.message);
     } catch (error) {
       if (error instanceof AxiosError) {
-        console.log(error.response?.data.message);
-        toast(error.response?.data.message);
+        return toast(error.response?.data.message);
       }
       if (error instanceof Error) {
-        toast(error.message || "Unknown error, please try again");
+        return toast(error.message || "Unknown error, please try again");
       }
     }
   };

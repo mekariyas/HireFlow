@@ -35,11 +35,8 @@ export const signUpSanitize = async (
 };
 
 const Login = z.object({
-  email: z.email("email: expected a string containing @").trim(),
-  password: z
-    .string("password: expected a string with a minimum length of 8 characters")
-    .trim()
-    .min(8),
+  userEmail: z.email("email: expected a string containing @").trim(),
+  password: z.string("password: expected a string").trim(),
 });
 
 export const logInSanitize = async (
@@ -59,6 +56,8 @@ export const logInSanitize = async (
     req.body = result.data;
     next();
   } catch (error) {
+    console.log("login validation error");
+    console.error(error);
     return res.status(500).json({ message: "Internal Server error" });
   }
 };
