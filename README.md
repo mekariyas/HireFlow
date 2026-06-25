@@ -23,13 +23,18 @@ It utilizes protect routes, file uploads for both user and companies.
 - Neon
 - Drizzle
 ## How to install
-1. Clone the repository using git clone
-2. cd Hireflow
-### Frontend
-1. cd frontend
-2. npm install
-3. npm run dev
-### backend
-1. cd backend
-2. npm install
-3. npm run dev
+  ```
+   git clone https://github.com/mekariyas/hireflow
+  ```
+  ### Frontend
+  ```
+    cd frontend
+    npm install
+    npm run dev 
+  ```
+  ### backend
+  ```
+     cd backend
+     npm install
+     npm run dev 
+  ```
