@@ -1,6 +1,7 @@
 import { AxiosError } from "axios";
 import { useSearchParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useTokenStorage } from "../../store/token";
 
 import {
   Accordion,
@@ -23,12 +24,17 @@ import type { IApplication } from "../types/company-types";
 
 const Applicants = () => {
   const [searchParams] = useSearchParams();
-
+  const accessToken = useTokenStorage((state) => state.companyToken);
+  const setAccessToken = useTokenStorage((state) => state.setCompanyToken);
   const { error, isLoading, data } = useQuery({
     queryKey: ["listingInfo", searchParams.get("jobId")],
-    //jobs/:jobId/applications
     queryFn: () =>
-      api.get(`/company/jobs/${searchParams.get("jobId")}/applications`),
+      api.get(`/company/jobs/${searchParams.get("jobId")}/applications`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        withCredentials: true,
+      }),
   });
   if (isLoading) {
     return <Spinner />;
@@ -39,7 +45,10 @@ const Applicants = () => {
   if (error instanceof Error) {
     return <ErrorComponent error={error.message} />;
   }
-  console.log(data);
+
+  if (data) {
+    setAccessToken(data.data.accessToken);
+  }
 
   const getDownloadUrl = (url: string) => {
     return url.replace("/upload/", "/upload/fl_attachment/");

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AxiosError } from "axios";
 import { useParams, useNavigate } from "react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTokenStorage } from "../../store/token";
 import {
   Accordion,
   AccordionContent,
@@ -20,9 +21,17 @@ const Listings = () => {
   const [isEditVisible, setIsEditVisible] = useState<boolean>(false);
   const { companyId } = useParams();
   const navigate = useNavigate();
+  const accessToken = useTokenStorage((state) => state.companyToken);
+  const setAccessToken = useTokenStorage((state) => state.setCompanyToken);
   const { error, isLoading, data } = useQuery({
     queryKey: ["listingInfo", companyId],
-    queryFn: () => api.get(`/company/${companyId}/listings`),
+    queryFn: () =>
+      api.get(`/company/${companyId}/listings`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        withCredentials: true,
+      }),
   });
 
   const deleteMutation = useMutation({
@@ -62,7 +71,9 @@ const Listings = () => {
   if (error instanceof Error) {
     return <ErrorComponent error={error.message} />;
   }
-  console.log(data);
+  if (data) {
+    setAccessToken(data.data.accessToken);
+  }
   return (
     <section className="w-full flex flex-col gap-4 items-center mb-10">
       <section className="mb-8 mt-6">
