@@ -8,6 +8,8 @@ import {
   AvatarImage,
 } from "../../components/ui/avatar";
 
+import { useTokenStorage } from "../../store/token";
+
 import { toast } from "sonner";
 
 import {
@@ -25,10 +27,21 @@ import type { Ijobs } from "../types/user-types";
 const Jobs = () => {
   const { userId } = useParams();
 
+  const accessToken = useTokenStorage((state) => state.userToken);
+
+  const setAccessToken = useTokenStorage((state) => state.setUserToken);
+
   const { error, isLoading, data } = useQuery({
     queryKey: ["jobsInfo", userId],
     queryFn: () =>
-      api.get(`/user/${userId}/getJobs`, { withCredentials: true }),
+      api.get(
+        `/user/${userId}/getJobs`,
+        {
+          headers: { 
+          Authorization: `Bearer ${accessToken}`, 
+        },
+    withCredentials: true,
+  }),
   });
 
   const apply = useMutation({
@@ -40,7 +53,10 @@ const Jobs = () => {
       const apply = await api.post(
         `user/jobs/${jobId}/apply`,
         { userId },
-        { withCredentials: true },
+        {
+          headers: { authorization: `authentication ${accessToken}` },
+          withCredentials: true,
+        },
       );
       toast(apply.data.data.message);
     } catch (error) {
@@ -71,6 +87,9 @@ const Jobs = () => {
     return <Spinner />;
   }
 
+  if (data) {
+    setAccessToken(data.data?.accessToken);
+  }
   return (
     <section className="w-full max-w-6xl mx-auto px-4 py-8">
       <section className="mb-8">

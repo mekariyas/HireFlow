@@ -2,7 +2,7 @@ import { AxiosError } from "axios";
 import { useState } from "react";
 import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-
+import { useTokenStorage } from "../../store/token";
 import { Button } from "../../components/ui/button";
 import {
   Avatar,
@@ -17,7 +17,8 @@ import api from "../../api/axios";
 const CompanyProfile = () => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const { companyId } = useParams();
-
+  const accessToken = useTokenStorage((state) => state.companyToken);
+  const setAccessToken = useTokenStorage((state) => state.setCompanyToken);
   const handleFormVisibility = () => {
     console.log("I have been called");
     setIsVisible(false);
@@ -25,7 +26,13 @@ const CompanyProfile = () => {
 
   const { error, isLoading, data } = useQuery({
     queryKey: ["userInfo"],
-    queryFn: () => api.get(`/company/${companyId}`),
+    queryFn: () =>
+      api.get(`/company/${companyId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        withCredentials: true,
+      }),
   });
   if (isLoading) {
     return <Spinner />;
@@ -45,6 +52,7 @@ const CompanyProfile = () => {
   }
 
   if (data) {
+    setAccessToken(data.data.accessToken);
     return (
       <section className="w-full flex flex-col items-center gap-2 pb-20">
         <section className="w-full flex justify-around lg:justify-center lg:gap-3 items-center pt-10">

@@ -20,8 +20,8 @@ export interface IJobForm {
   location?: string;
   jobType?: string;
   class?: string;
-  jobId: number;
-  editVisible: boolean;
+  jobId?: number;
+  editVisible?: boolean;
 }
 
 export interface IJob {

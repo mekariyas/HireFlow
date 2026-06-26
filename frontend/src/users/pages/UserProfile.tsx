@@ -1,6 +1,7 @@
 import { AxiosError } from "axios";
 import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useTokenStorage } from "../../store/token";
 import {
   Avatar,
   AvatarImage,
@@ -12,9 +13,15 @@ import api from "../../api/axios";
 
 const UserProfile = () => {
   const { userId } = useParams();
+  const accessToken = useTokenStorage((state) => state.userToken);
+  const setAccessToken = useTokenStorage((state) => state.setUserToken);
   const { error, isLoading, data } = useQuery({
     queryKey: ["userInfo"],
-    queryFn: () => api.get(`/user/${userId}`, { withCredentials: true }),
+    queryFn: () =>
+      api.get(`/user/${userId}`, {
+        headers: { authorization: `authentication ${accessToken}` },
+        withCredentials: true,
+      }),
   });
   if (isLoading) {
     return <Spinner />;
@@ -35,6 +42,7 @@ const UserProfile = () => {
   }
 
   if (data) {
+    setAccessToken(data.data.accessToken);
     const getDownloadUrl = (url: string) =>
       url.replace("/upload/", "/upload/fl_attachment/");
     return (
