@@ -166,3 +166,65 @@ export const getJobs = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const searchJob = async (req: Request, res: Response) => {
+  try {
+    const { title, locationType, jobType } = req.query as {
+      title?: string;
+      locationType?: string;
+      jobType?: string;
+    };
+
+    if (!title && !locationType && !jobType) {
+      return res
+        .status(400)
+        .json({ message: "Provide at least one search parameter" });
+    }
+
+    const jobs = await db
+      .select({
+        id: jobsTable.id,
+        title: jobsTable.title,
+        description: jobsTable.description,
+        locationType: jobsTable.locationType,
+        jobType: jobsTable.jobType,
+        createdAt: jobsTable.createdAt,
+        updatedAt: jobsTable.updatedAt,
+        companyId: jobsTable.companyId,
+        companyName: companyTable.name,
+        profileURL: companyTable.profileURL,
+      })
+      .from(jobsTable)
+      .innerJoin(companyTable, eq(companyTable.id, jobsTable.companyId))
+      .where(
+        or(
+          title ? ilike(jobsTable.title, `%${title}%`) : undefined,
+          locationType
+            ? eq(
+                jobsTable.locationType,
+                locationType as "Remote" | "Hybrid" | "On-site",
+              )
+            : undefined,
+          jobType
+            ? eq(
+                jobsTable.jobType,
+                jobType as
+                  | "Full-time"
+                  | "Part-time"
+                  | "Contract"
+                  | "Internship",
+              )
+            : undefined,
+        ),
+      )
+      .limit(20);
+
+    if (jobs.length === 0) {
+      return res.status(404).json({ message: "No jobs found" });
+    }
+
+    return res.status(200).json({ message: "Found jobs", jobs });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};

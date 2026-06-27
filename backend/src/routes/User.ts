@@ -6,11 +6,10 @@ import {
   getUser,
   viewApplication,
   getApplications,
-  searchJob,
   apply,
 } from "../controllers/user.js";
 
-import { getJobs } from "../controllers/jobs.js";
+import { getJobs, searchJob } from "../controllers/jobs.js";
 
 import { checkUserEmail } from "../middleware/user/checkUserEmail.js";
 import {
@@ -43,7 +42,7 @@ userRouter.post(
   ],
   signUp,
 );
-userRouter.post("/logIn", logInSanitize, logIn);
+userRouter.get("/logIn", logInSanitize, logIn);
 userRouter.post(
   "/searchJob",
   authorizationMiddleWare,

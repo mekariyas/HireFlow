@@ -118,7 +118,7 @@ const searchJob = z.object({
   email: z.email(),
   role: z.string().trim(),
   title: z.string().trim().optional(),
-  location: z.string().trim().optional(),
+  locationType: z.string().trim().optional(),
   jobType: z.string().trim().optional(),
 });
 
@@ -128,13 +128,16 @@ export const searchJobSanitize = async (
   next: NextFunction,
 ) => {
   try {
-    const result = searchJob.safeParse(req.body);
+    const result = searchJob.safeParse({ ...req.body, ...req.params });
     if (!result.success) {
       return res.status(400).json({
         message: "Invalid Data, couldn't carry out action",
       });
     }
-    req.body = result.data;
+    const { title, jobType, locationType } = result.data;
+    req.params.title = title as string;
+    req.params.jobType = jobType as string;
+    req.params.locationType = locationType as string;
     next();
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });

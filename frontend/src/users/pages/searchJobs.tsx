@@ -1,106 +1,94 @@
 import { AxiosError } from "axios";
-{
-  /*import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "../../components/ui/accordion";*/
-}
-
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
-import { useMutation } from "@tanstack/react-query";
 import {
   NativeSelect,
   NativeSelectOption,
 } from "../../components/ui/native-select";
 import { toast } from "sonner";
-
+import Jobs from "../components/Jobs";
 import { useForm, type SubmitHandler } from "react-hook-form";
-
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import type { IsearchJobs } from "../types/user-types";
-
-//axios instance
 import api from "../../api/axios";
 
 const SearchJobs = () => {
+  const [params, setParams] = useState<IsearchJobs | null>(null);
   const { register, handleSubmit } = useForm<IsearchJobs>();
-  const searchMutation = useMutation({
-    mutationFn: async ({
-      title,
-      locationType,
-      jobType,
-    }: {
-      title?: string;
-      locationType?: string;
-      jobType?: string;
-    }) => {
-      return await api.post(
-        "/user/searchJob",
-        { title, locationType, jobType },
-        {},
-      );
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["jobSearch", params],
+    queryFn: async () => {
+      const searchParams = new URLSearchParams();
+      if (params?.title) searchParams.set("title", params.title);
+      if (params?.locationType)
+        searchParams.set("locationType", params.locationType);
+      if (params?.jobType) searchParams.set("jobType", params.jobType);
+      return await api.get(`/user/searchJob?${searchParams.toString()}`);
     },
+    enabled: !!params, // only runs when params are set
   });
-  const handleJobSearch: SubmitHandler<IsearchJobs> = async (data) => {
-    try {
-      searchMutation.mutate({
-        title: data.title,
-        locationType: data.locationType,
-        jobType: data.jobType,
-      });
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        return toast(error.response?.data.message);
-      }
-      if (error instanceof Error) {
-        return toast(error.message);
-      }
-    }
+
+  const handleJobSearch: SubmitHandler<IsearchJobs> = (data) => {
+    setParams(data);
   };
+
+  if (error instanceof AxiosError) {
+    toast(error.response?.data.message ?? "Something went wrong");
+  }
+
   return (
     <section className="w-full flex flex-col pt-4 pb-4">
       <form
-        className="flex flex-col lg:flex-row gap-4"
+        className="flex flex-col lg:flex-row gap-4 items-end"
         onSubmit={handleSubmit(handleJobSearch)}
       >
-        <Label htmlFor="title">Job Title</Label>
-        <Input
-          type="text"
-          placeholder="Search Job Title"
-          {...register("title")}
-        />
-        <Label htmlFor="locationType">Location:</Label>
-        <NativeSelect {...register("locationType")}>
-          <NativeSelectOption value="" disabled>
-            Select location type
-          </NativeSelectOption>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="title">Job Title</Label>
+          <Input
+            id="title"
+            type="text"
+            placeholder="e.g. React Developer"
+            {...register("title")}
+          />
+        </div>
 
-          <NativeSelectOption value="Remote">Remote</NativeSelectOption>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="locationType">Location Type</Label>
+          <NativeSelect id="locationType" {...register("locationType")}>
+            <NativeSelectOption value="" disabled>
+              Select location
+            </NativeSelectOption>
+            <NativeSelectOption value="Remote">Remote</NativeSelectOption>
+            <NativeSelectOption value="Hybrid">Hybrid</NativeSelectOption>
+            <NativeSelectOption value="On-site">On-Site</NativeSelectOption>
+          </NativeSelect>
+        </div>
 
-          <NativeSelectOption value="Hybrid">Hybrid</NativeSelectOption>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="jobType">Job Type</Label>
+          <NativeSelect id="jobType" {...register("jobType")}>
+            <NativeSelectOption value="" disabled>
+              Select job type
+            </NativeSelectOption>
+            <NativeSelectOption value="Full-time">Full-time</NativeSelectOption>
+            <NativeSelectOption value="Part-time">Part-time</NativeSelectOption>
+            <NativeSelectOption value="Contract">Contract</NativeSelectOption>
+            <NativeSelectOption value="Internship">
+              Internship
+            </NativeSelectOption>
+          </NativeSelect>
+        </div>
 
-          <NativeSelectOption value="On-site">On-Site</NativeSelectOption>
-        </NativeSelect>
-        <Label htmlFor="location">Job Type:</Label>
-        <NativeSelect {...register("jobType")}>
-          <NativeSelectOption value="" disabled>
-            Select job type
-          </NativeSelectOption>
-
-          <NativeSelectOption value="Full-time">Full-time</NativeSelectOption>
-
-          <NativeSelectOption value="Part-time">Part-time</NativeSelectOption>
-
-          <NativeSelectOption value="Contract">Contract</NativeSelectOption>
-
-          <NativeSelectOption value="Internship">Internship</NativeSelectOption>
-        </NativeSelect>
-        <Button type="submit"></Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? "Searching..." : "Search Jobs"}
+        </Button>
       </form>
-      {/* { searchMutation.data && (<Jobs jobs={searchMutation.data.data}/>)} */}
+
+      {/* Results */}
+      {data?.data?.jobs && <Jobs jobs={data.data.jobs} />}
     </section>
   );
 };

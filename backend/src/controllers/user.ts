@@ -1,8 +1,13 @@
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 import type { Request, Response } from "express";
-import { usersTable, jobsTable, applicationTable } from "../db/schema.js";
-import { eq, and, ilike } from "drizzle-orm";
+import {
+  usersTable,
+  jobsTable,
+  applicationTable,
+  companyTable,
+} from "../db/schema.js";
+import { eq, and, ilike, isNull, or } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 const db = drizzle(process.env.DATABASE_URL!);
@@ -278,91 +283,8 @@ const viewApplication = async (req: Request, res: Response) => {
   }
 };
 
-const searchJob = async (req: Request, res: Response) => {
-  try {
-    const { title, locationType, jobType, accessToken } = req.body;
-    if (!title && !locationType && !jobType) {
-      return res.status(400).json({ message: "Incomplete data" });
-    }
-
-    if (title && locationType && jobType) {
-      const jobs = await db
-        .select({
-          id: jobsTable.id,
-          title: jobsTable.title,
-          description: jobsTable.description,
-          locationType: jobsTable.locationType,
-          jobType: jobsTable.jobType,
-          createdAt: jobsTable.createdAt,
-          updatedAt: jobsTable.updatedAt,
-        })
-        .from(jobsTable)
-        .where(
-          and(
-            ilike(jobsTable.title, `%${title}%`),
-            eq(jobsTable.locationType, locationType),
-            eq(jobsTable.jobType, jobType),
-          ),
-        )
-        .limit(5);
-      return res.status(200).json({ message: "Found jobs", accessToken, jobs });
-    }
-    if (title && (!locationType || !jobType)) {
-      const jobs = await db
-        .select({
-          id: jobsTable.id,
-          title: jobsTable.title,
-          description: jobsTable.description,
-          locationType: jobsTable.locationType,
-          jobType: jobsTable.jobType,
-          createdAt: jobsTable.createdAt,
-          updatedAt: jobsTable.updatedAt,
-        })
-        .from(jobsTable)
-        .where(ilike(jobsTable.title, `%${title}%`))
-        .limit(5);
-      return res.status(200).json({ message: "Found jobs", accessToken, jobs });
-    }
-    if (locationType && (!title || !jobType)) {
-      const jobs = await db
-        .select({
-          id: jobsTable.id,
-          title: jobsTable.title,
-          description: jobsTable.description,
-          locationType: jobsTable.locationType,
-          jobType: jobsTable.jobType,
-          createdAt: jobsTable.createdAt,
-          updatedAt: jobsTable.updatedAt,
-        })
-        .from(jobsTable)
-        .where(eq(jobsTable.locationType, locationType))
-        .limit(5);
-      return res.status(200).json({ message: "Found jobs", accessToken, jobs });
-    }
-    if (jobType && (!title || !locationType)) {
-      const jobs = await db
-        .select({
-          id: jobsTable.id,
-          title: jobsTable.title,
-          description: jobsTable.description,
-          locationType: jobsTable.locationType,
-          jobType: jobsTable.jobType,
-          createdAt: jobsTable.createdAt,
-          updatedAt: jobsTable.updatedAt,
-        })
-        .from(jobsTable)
-        .where(eq(jobsTable.jobType, jobType))
-        .limit(5);
-      return res.status(200).json({ message: "Found jobs", accessToken, jobs });
-    }
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
 const logOut = (req: Request, res: Response) => {
   try {
-    console.log("you called for user log out");
     const userToken = req.cookies?.userToken;
     if (!userToken) {
       return res
