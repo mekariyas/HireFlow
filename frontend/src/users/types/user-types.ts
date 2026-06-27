@@ -19,7 +19,7 @@ export interface Ijobs {
   id: number;
   title: string;
   name: string;
-  profileURL: string;
+  profileURL?: string;
   description: string;
   jobType: string;
   createdAt: string;

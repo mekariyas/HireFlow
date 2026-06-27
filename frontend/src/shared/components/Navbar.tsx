@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { NavLink } from "react-router";
+import { NavLink, useParams } from "react-router";
 
 const Navbar = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { userId, companyId } = useParams();
   return (
     <>
       <header className="w-full h-16 text-white bg-gray-900 shadow-2xl flex justify-between items-center px-10 sticky top-0 z-50">
@@ -10,92 +11,97 @@ const Navbar = () => {
         <NavLink to="/" className="text-xl font-extrabold tracking-tight">
           Hire<span className="text-indigo-400">Flow</span>
         </NavLink>
-
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              isActive
-                ? "text-indigo-400"
-                : "hover:text-indigo-300 transition-colors"
-            }
-          >
-            Home
-          </NavLink>
-          <NavLink
-            to="/about"
-            className={({ isActive }) =>
-              isActive
-                ? "text-indigo-400"
-                : "hover:text-indigo-300 transition-colors"
-            }
-          >
-            About Us
-          </NavLink>
-          <NavLink
-            to="/pricing"
-            className={({ isActive }) =>
-              isActive
-                ? "text-indigo-400"
-                : "hover:text-indigo-300 transition-colors"
-            }
-          >
-            Pricing
-          </NavLink>
-          <div className="relative group">
-            <span className="hover:text-indigo-300 transition-colors cursor-pointer">
-              For Companies ▾
-            </span>
-            <div className="absolute top-8 left-0 w-40 bg-white text-gray-800 rounded-lg shadow-lg overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col">
+        {!userId && !companyId ? (
+          <>
+            {/* Desktop nav */}
+            <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
               <NavLink
-                to="/companies/signup"
-                className="px-4 py-2.5 text-sm hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                to="/"
+                className={({ isActive }) =>
+                  isActive
+                    ? "text-indigo-400"
+                    : "hover:text-indigo-300 transition-colors"
+                }
+              >
+                Home
+              </NavLink>
+              <NavLink
+                to="/about"
+                className={({ isActive }) =>
+                  isActive
+                    ? "text-indigo-400"
+                    : "hover:text-indigo-300 transition-colors"
+                }
+              >
+                About Us
+              </NavLink>
+              <NavLink
+                to="/pricing"
+                className={({ isActive }) =>
+                  isActive
+                    ? "text-indigo-400"
+                    : "hover:text-indigo-300 transition-colors"
+                }
+              >
+                Pricing
+              </NavLink>
+              <div className="relative group">
+                <span className="hover:text-indigo-300 transition-colors cursor-pointer">
+                  For Companies ▾
+                </span>
+                <div className="absolute top-8 left-0 w-40 bg-white text-gray-800 rounded-lg shadow-lg overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col">
+                  <NavLink
+                    to="/companies/signup"
+                    className="px-4 py-2.5 text-sm hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                  >
+                    Sign up
+                  </NavLink>
+                  <NavLink
+                    to="/companies/login"
+                    className="px-4 py-2.5 text-sm hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                  >
+                    Log in
+                  </NavLink>
+                </div>
+              </div>
+            </nav>
+
+            {/* Desktop auth buttons */}
+            <div className="hidden md:flex items-center gap-3">
+              <NavLink
+                to="/user/signup"
+                className="text-sm font-semibold hover:text-indigo-300 transition-colors"
               >
                 Sign up
               </NavLink>
               <NavLink
-                to="/companies/login"
-                className="px-4 py-2.5 text-sm hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                to="/user/login"
+                className="text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-colors"
               >
                 Log in
               </NavLink>
             </div>
-          </div>
-        </nav>
 
-        {/* Desktop auth buttons */}
-        <div className="hidden md:flex items-center gap-3">
-          <NavLink
-            to="/user/signup"
-            className="text-sm font-semibold hover:text-indigo-300 transition-colors"
-          >
-            Sign up
-          </NavLink>
-          <NavLink
-            to="/user/login"
-            className="text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-colors"
-          >
-            Log in
-          </NavLink>
-        </div>
-
-        {/* Hamburger — mobile only */}
-        <button
-          className="md:hidden flex flex-col gap-1.5 p-2"
-          onClick={() => setSidebarOpen(true)}
-          aria-label="Open menu"
-        >
-          <span className="w-6 h-0.5 bg-white rounded" />
-          <span className="w-6 h-0.5 bg-white rounded" />
-          <span className="w-6 h-0.5 bg-white rounded" />
-        </button>
+            {/* Hamburger — mobile only */}
+            <button
+              className="md:hidden flex flex-col gap-1.5 p-2"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open menu"
+            >
+              <span className="w-6 h-0.5 bg-white rounded" />
+              <span className="w-6 h-0.5 bg-white rounded" />
+              <span className="w-6 h-0.5 bg-white rounded" />
+            </button>
+          </>
+        ) : (
+          <></>
+        )}
       </header>
 
       {/* Backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-50 md:hidden"
+          className={`fixed inset-0 bg-black/50 z-50 ${!userId && !companyId ? "" : "hidden"} md:hidden`}
           onClick={() => setSidebarOpen(false)}
         />
       )}
