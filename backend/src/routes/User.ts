@@ -6,6 +6,7 @@ import {
   getUser,
   viewApplication,
   getApplications,
+  searchJob,
   apply,
 } from "../controllers/user.js";
 
@@ -22,6 +23,7 @@ import {
   logInSanitize,
   getProfileSanitize,
   applySanitize,
+  searchJobSanitize,
 } from "../middleware/user/auth/validation.js";
 
 import { authorizationMiddleWare } from "../middleware/user/auth/authorization.js";
@@ -42,6 +44,12 @@ userRouter.post(
   signUp,
 );
 userRouter.post("/logIn", logInSanitize, logIn);
+userRouter.post(
+  "/searchJob",
+  authorizationMiddleWare,
+  searchJobSanitize,
+  searchJob,
+);
 userRouter.get("/logout", logOut);
 userRouter.get("/:id", authorizationMiddleWare, getProfileSanitize, getUser);
 userRouter.get("/:userId/getJobs", authorizationMiddleWare, getJobs);

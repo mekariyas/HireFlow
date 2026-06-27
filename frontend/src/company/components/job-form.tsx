@@ -6,6 +6,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { useParams } from "react-router";
+import { useTokenStorage } from "../../store/token";
 import { useMutation } from "@tanstack/react-query";
 import {
   NativeSelect,
@@ -18,6 +19,8 @@ import { toast } from "sonner";
 
 const JobForm = ({ ...props }: IJobForm & { children?: React.ReactNode }) => {
   const { companyId } = useParams();
+  const accessToken =  useTokenStorage((state)=>state.companyToken);
+  const setCompanyToken = useTokenStorage((state)=>state.setCompanyToken)
   const [isPosting, setIsPosting] = useState<boolean>(false);
 
   const {
@@ -50,12 +53,16 @@ const JobForm = ({ ...props }: IJobForm & { children?: React.ReactNode }) => {
           location,
         },
         {
+          headers:{
+            authorization : `authenticate ${accessToken}`
+          },
           withCredentials: true,
         },
       );
     },
 
     onSuccess: (response) => {
+      setCompanyToken(response.data.accessToken);
       toast(response.data.message);
       props.handleFormVisibility();
     },
@@ -101,6 +108,7 @@ const JobForm = ({ ...props }: IJobForm & { children?: React.ReactNode }) => {
       });
 
       toast(jobPost.data.message);
+      setCompanyToken(jobPost.data.accessToken);
       props.handleFormVisibility();
     } catch (error) {
       if (error instanceof AxiosError) {

@@ -34,14 +34,12 @@ const Jobs = () => {
   const { error, isLoading, data } = useQuery({
     queryKey: ["jobsInfo", userId],
     queryFn: () =>
-      api.get(
-        `/user/${userId}/getJobs`,
-        {
-          headers: { 
-          Authorization: `Bearer ${accessToken}`, 
+      api.get(`/user/${userId}/getJobs`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
-    withCredentials: true,
-  }),
+        withCredentials: true,
+      }),
   });
 
   const apply = useMutation({
@@ -59,6 +57,7 @@ const Jobs = () => {
         },
       );
       toast(apply.data.data.message);
+      setAccessToken(apply.data?.data.accessToken);
     } catch (error) {
       if (error instanceof AxiosError) {
         return toast(error.response?.data.message);

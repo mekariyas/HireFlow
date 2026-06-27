@@ -5,6 +5,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Eye, EyeClosed } from "lucide-react";
+import { useTokenStorage } from "../../store/token";
 import {
   NativeSelect,
   NativeSelectOption,
@@ -19,6 +20,7 @@ import type { ISignUp } from "../types/user-types";
 import api from "../../api/axios";
 
 const SignUpForm = () => {
+  const setUserAccessToken = useTokenStorage((state) => state.setUserToken);
   const {
     register,
     handleSubmit,
@@ -50,6 +52,7 @@ const SignUpForm = () => {
       const signUp = await api.post("/user/signUp", formData, {
         withCredentials: true,
       });
+      setUserAccessToken(signUp.data.accessToken);
       const { id } = signUp.data;
       navigate(`/user/${id}/profile`);
     } catch (error) {

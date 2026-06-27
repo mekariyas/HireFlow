@@ -113,3 +113,30 @@ export const applySanitize = async (
     return res.status(500).json({ message: "Internal Server error" });
   }
 };
+
+const searchJob = z.object({
+  email: z.email(),
+  role: z.string().trim(),
+  title: z.string().trim().optional(),
+  location: z.string().trim().optional(),
+  jobType: z.string().trim().optional(),
+});
+
+export const searchJobSanitize = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const result = searchJob.safeParse(req.body);
+    if (!result.success) {
+      return res.status(400).json({
+        message: "Invalid Data, couldn't carry out action",
+      });
+    }
+    req.body = result.data;
+    next();
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
