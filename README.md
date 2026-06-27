@@ -11,6 +11,7 @@ It utilizes protect routes, file uploads for both user and companies.
  - React Query
  - React Hook Form
  - Zustand
+ - ShadCN
 ### Backend
 - Node js
 - Express js
@@ -22,6 +23,8 @@ It utilizes protect routes, file uploads for both user and companies.
 - Express rate limiter
 - Neon
 - Drizzle
+- Helmet.js
+- CORS
 ## How to install
   ```
    git clone https://github.com/mekariyas/hireflow
