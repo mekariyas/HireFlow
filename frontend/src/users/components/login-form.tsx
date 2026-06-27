@@ -6,6 +6,7 @@ import { Label } from "../../components/ui/label";
 import { CardAction } from "../../components/ui/card";
 import { Eye, EyeClosed } from "lucide-react";
 import { useNavigate } from "react-router";
+import { useTokenStorage } from "../../store/token";
 import { toast } from "sonner";
 import { type ISignIn } from "../types/user-types";
 
@@ -15,6 +16,7 @@ import api from "../../api/axios";
 const LoginForm = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const setUserAccessToken = useTokenStorage((state) => state.setUserToken);
   const {
     register,
     handleSubmit,
@@ -35,6 +37,7 @@ const LoginForm = () => {
         { userEmail: data.email, password: data.password },
         { withCredentials: true },
       );
+      setUserAccessToken(logIn.data.accessToken);
       const { id } = logIn.data;
       navigate(`/user/${id}/dashboard`);
     } catch (error) {

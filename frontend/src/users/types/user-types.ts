@@ -26,3 +26,9 @@ export interface Ijobs {
   location: string;
   companyId: number;
 }
+
+export interface IsearchJobs {
+  title?: string;
+  locationType?: string;
+  jobType?: string;
+}

@@ -20,6 +20,7 @@ import UserSignup from "./users/pages/signup";
 import UserLogin from "./users/pages/login";
 import UserProfile from "./users/pages/UserProfile";
 import Jobs from "./users/pages/Jobs";
+import SearchJobs from "./users/pages/searchJobs";
 const App = () => {
   const router = createBrowserRouter([
     {
@@ -52,6 +53,10 @@ const App = () => {
               element: <Dashboard />,
               children: [
                 { index: true, element: <CompanyProfile /> },
+                {
+                  path: "searchJobs",
+                  element: <SearchJobs />,
+                },
                 {
                   path: "settings",
                   element: <Settings />,
