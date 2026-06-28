@@ -308,6 +308,5 @@ export {
   getUser,
   viewApplication,
   getApplications,
-  searchJob,
   apply,
 };
