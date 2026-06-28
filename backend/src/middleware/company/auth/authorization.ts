@@ -18,7 +18,6 @@ export const authorizationMiddleWare = async (
         (err: any, decoded: any) => {
           if (err) {
             validateRefreshToken(req, res);
-            console.log("calling next");
             return next();
           } else {
             req.body = {
